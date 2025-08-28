@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "$MAMBO",
-  description: "Memecoin landing with hero signpost + chunky CA banner.",
+  description: "Memecoin on ETH",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
