@@ -1,0 +1,18 @@
+/* Tailwind v4: import the whole framework */
+@import "tailwindcss";
+
+html { scroll-behavior: smooth; }
+body { background: #000; color: #e5e7eb; }
+
+/* -------------------------------------------
+   EXTRA SAFETY FOR SCALING / ZOOM
+   ------------------------------------------- */
+
+/* Prevent images from ever stretching out of their boxes */
+img { max-width: 100%; height: auto; }
+
+/* Make iframes (tweets / TV widget) never overflow parents */
+iframe { max-width: 100%; display: block; }
+
+/* Ensure any grid/flex panel we forgot won’t spill content at zoom */
+.min-h-0, .overflow-hidden { min-height: 0; }
