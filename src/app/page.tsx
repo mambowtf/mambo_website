@@ -420,9 +420,19 @@ function TradingViewChart({ symbol }: { symbol: string }) {
 /* ============================== FALLING BANANAS ============================== */
 
 function FallingBanana({ left, delay }: { left: number; delay: number }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, delay * 1000);
+    
+    return () => clearTimeout(timer);
+  }, [delay]);
+
   return (
     <div 
-      className="banana-fall"
+      className={`banana-fall ${isVisible ? 'animate' : ''}`}
       style={{ 
         left: `${left}%`,
         animationDelay: `${delay}s`
@@ -504,15 +514,7 @@ export default function Page() {
   // Scroll animations
   const visibleElements = useScrollAnimation();
   
-  // Falling bananas
-  const { hasTriggered, startBananaRain, bananaData } = useFallingBananas();
-  
-  // Trigger banana rain when memes section comes into view
-  useEffect(() => {
-    if (visibleElements.has('memes-section')) {
-      startBananaRain();
-    }
-  }, [visibleElements, startBananaRain]);
+  // Removed scroll-triggered bananas - only button explosion remains
 
   // ===== Copy CA button =====
   const [copied, setCopied] = useState(false);
@@ -633,6 +635,9 @@ export default function Page() {
                     letterSpacing: 0.5,
                     textShadow: "0 2px 0 rgba(0,0,0,.35)",
                     whiteSpace: "nowrap",
+                    WebkitTextStroke: "1px #000000",
+                    textStroke: "1px #000000",
+                    paintOrder: "stroke fill",
                   }}
                 >
                   {label}
@@ -672,9 +677,9 @@ export default function Page() {
           />
         </div>
 
-        {/* Hero buttons - Mobile (where text was) */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[12%] text-center md:hidden">
-          <div className="flex gap-3 max-w-[95vw] mx-auto px-4">
+        {/* Hero buttons - Mobile (4x1 horizontal at top left) */}
+        <div className="absolute left-[5%] top-[5%] text-center md:hidden">
+          <div className="grid grid-cols-4 gap-1">
             {SIGN_LINKS.map(({ key, label, href }) => {
               const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
               return (
@@ -684,19 +689,22 @@ export default function Page() {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={label}
-                  className="select-none hover-jiggle rounded-xl border-2 border-black text-center flex-1"
+                  className="select-none hover-jiggle rounded-lg border-2 border-black text-center"
                   style={{
                     background: palette.bg,
                     color: palette.color,
-                    boxShadow: "0 6px 12px rgba(0,0,0,.28)",
+                    boxShadow: "0 4px 8px rgba(0,0,0,.28)",
                     textDecoration: "none",
-                    minHeight: "48px",
+                    width: "60px",
+                    height: "40px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "clamp(12px, 3vw, 16px)",
+                    fontSize: "clamp(10px, 2.5vw, 12px)",
                     fontWeight: "600",
-                    padding: "8px 16px",
+                    WebkitTextStroke: "1px #000000",
+                    textStroke: "1px #000000",
+                    paintOrder: "stroke fill",
                   }}
                 >
                   {label}
@@ -781,19 +789,23 @@ export default function Page() {
       {/* ================= TEXT SLIDER ================= */}
       <section className="py-[0.85rem] overflow-hidden" style={{ backgroundColor: "#085EB2" }}>
         <div className="relative">
-          <div className="flex animate-scroll whitespace-nowrap">
-            <div className="flex items-center space-x-8 text-white">
-              {Array.from({ length: 10 }).map((_, i) => (
+          <div className="flex animate-scroll whitespace-nowrap" style={{ width: "200%" }}>
+            <div className="flex items-center space-x-8 text-white" style={{ minWidth: "100%" }}>
+              {Array.from({ length: 2 }).map((_, i) => (
                 <span
                   key={i}
                   className={`${luckiest.className} text-xl md:text-3xl font-bold`}
                   style={{
                     fontSize: "clamp(16px, 3.2vw, 28px)",
                     color: "#ffffff",
+                    WebkitTextStroke: "2px #000000",
+                    textStroke: "2px #000000",
+                    paintOrder: "stroke fill",
                     textShadow: "2px 2px 0 #000",
+                    whiteSpace: "nowrap"
                   }}
                 >
-                  NEW WEBSITE LIVE
+                  NEW WEBSITE LIVE • $MAMBO THE GORILLA • NEW WEBSITE LIVE • $MAMBO THE GORILLA • NEW WEBSITE LIVE • $MAMBO THE GORILLA • NEW WEBSITE LIVE • $MAMBO THE GORILLA • NEW WEBSITE LIVE • $MAMBO THE GORILLA
                 </span>
               ))}
             </div>
@@ -805,7 +817,6 @@ export default function Page() {
       <section
         id="memes"
         className="relative pt-16"
-        data-scroll-id="memes-section"
         style={{
           height: "100vh",
           backgroundImage: `url(${MEMES_BG})`,
@@ -824,7 +835,12 @@ export default function Page() {
           >
             <h2
               className={`${luckiest.className} text-white leading-none mb-4`}
-              style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+              style={{ 
+                fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+                WebkitTextStroke: "2px #000000",
+                textStroke: "2px #000000",
+                paintOrder: "stroke fill"
+              }}
             >
               Memes
             </h2>
@@ -868,7 +884,12 @@ export default function Page() {
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('community-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            style={{ 
+              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+              WebkitTextStroke: "2px #000000",
+              textStroke: "2px #000000",
+              paintOrder: "stroke fill"
+            }}
             data-scroll-id="community-title"
           >
             Our Community is Always Active
@@ -885,7 +906,12 @@ export default function Page() {
         <div className="mx-auto w-[92vw] max-w-[1340px]">
           <h2
             className={`${luckiest.className} text-white leading-none mb-6 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            style={{ 
+              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+              WebkitTextStroke: "2px #000000",
+              textStroke: "2px #000000",
+              paintOrder: "stroke fill"
+            }}
             data-scroll-id="whitepaper-title"
           >
             Whitepaper
@@ -901,7 +927,12 @@ export default function Page() {
               <div className="text-white">
                 <p
                   className={`${luckiest.className} leading-tight`}
-                  style={{ fontSize: "clamp(28px, 2.6vw + 12px, 44px)" }}
+                  style={{ 
+                    fontSize: "clamp(28px, 2.6vw + 12px, 44px)",
+                    WebkitTextStroke: "2px #000000",
+                    textStroke: "2px #000000",
+                    paintOrder: "stroke fill"
+                  }}
                 >
                   Ready to learn more about $MAMBO?
                 </p>
@@ -923,7 +954,12 @@ export default function Page() {
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('lore-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            style={{ 
+              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+              WebkitTextStroke: "2px #000000",
+              textStroke: "2px #000000",
+              paintOrder: "stroke fill"
+            }}
             data-scroll-id="lore-title"
           >
             Mambo Lore
@@ -984,7 +1020,12 @@ export default function Page() {
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('chart-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            style={{ 
+              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+              WebkitTextStroke: "2px #000000",
+              textStroke: "2px #000000",
+              paintOrder: "stroke fill"
+            }}
             data-scroll-id="chart-title"
           >
             Live Chart
@@ -1000,7 +1041,12 @@ export default function Page() {
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            style={{ 
+              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+              WebkitTextStroke: "2px #000000",
+              textStroke: "2px #000000",
+              paintOrder: "stroke fill"
+            }}
             data-scroll-id="howbuy-title"
           >
             How to Buy
@@ -1031,11 +1077,231 @@ export default function Page() {
             <div className="text-center">
               <h2
                 className={`${luckiest.className} text-white leading-none`}
-                style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+                style={{ 
+                  fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+                  WebkitTextStroke: "2px #000000",
+                  paintOrder: "stroke fill"
+                }}
               >
                 GAME
               </h2>
-              <div className="text-red-400 font-extrabold mt-1">(coming soon)</div>
+              <div className="text-red-400 font-extrabold mt-2 mb-4">
+                Coming soon, in the meantime- press this button:
+              </div>
+              <button
+                onClick={(event) => {
+                  const button = event.target;
+                  const gameContainer = document.getElementById('game');
+                  
+                  // Add CHAOS to the button itself!
+                  button.style.animation = 'none';
+                  button.style.transform = 'scale(1.1)';
+                  button.style.filter = 'hue-rotate(180deg) brightness(1.5)';
+                  
+                  // Chaotic button shake
+                  const shakeAnimation = button.animate([
+                    { transform: 'translate(0, 0) rotate(0deg) scale(1.1)' },
+                    { transform: 'translate(-5px, -5px) rotate(-5deg) scale(1.2)' },
+                    { transform: 'translate(5px, -3px) rotate(5deg) scale(1.1)' },
+                    { transform: 'translate(-3px, 5px) rotate(-3deg) scale(1.3)' },
+                    { transform: 'translate(3px, 3px) rotate(3deg) scale(1.1)' },
+                    { transform: 'translate(0, 0) rotate(0deg) scale(1.1)' }
+                  ], {
+                    duration: 500,
+                    iterations: 3
+                  });
+                  
+                  // Add screen flash effect
+                  const flash = document.createElement('div');
+                  flash.style.position = 'fixed';
+                  flash.style.top = '0';
+                  flash.style.left = '0';
+                  flash.style.width = '100vw';
+                  flash.style.height = '100vh';
+                  flash.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+                  flash.style.zIndex = '9997';
+                  flash.style.pointerEvents = 'none';
+                  document.body.appendChild(flash);
+                  
+                  // Flash animation
+                  const flashAnimation = flash.animate([
+                    { opacity: 0 },
+                    { opacity: 1 },
+                    { opacity: 0 }
+                  ], {
+                    duration: 200,
+                    iterations: 2
+                  });
+                  
+                  // Screen shake effect
+                  document.body.style.animation = 'none';
+                  const screenShake = document.body.animate([
+                    { transform: 'translate(0, 0)' },
+                    { transform: 'translate(-2px, -2px)' },
+                    { transform: 'translate(2px, -1px)' },
+                    { transform: 'translate(-1px, 2px)' },
+                    { transform: 'translate(1px, 1px)' },
+                    { transform: 'translate(0, 0)' }
+                  ], {
+                    duration: 100,
+                    iterations: 5
+                  });
+                  
+
+                  
+                  // SCREEN WARP EFFECT (360° rotation around center)
+                  // Use body directly instead of wrapper to avoid scrolling issues
+                  document.body.style.transformOrigin = 'center center';
+                  const websiteWarp = document.body.animate([
+                    { 
+                      transform: 'rotate(0deg) scale(1)',
+                      filter: 'hue-rotate(0deg) brightness(1) saturate(1)'
+                    },
+                    { 
+                      transform: 'rotate(90deg) scale(1.05)',
+                      filter: 'hue-rotate(90deg) brightness(1.2) saturate(1.5)'
+                    },
+                    { 
+                      transform: 'rotate(180deg) scale(0.95)',
+                      filter: 'hue-rotate(180deg) brightness(0.8) saturate(2)'
+                    },
+                    { 
+                      transform: 'rotate(270deg) scale(1.02)',
+                      filter: 'hue-rotate(270deg) brightness(1.1) saturate(1.8)'
+                    },
+                    { 
+                      transform: 'rotate(360deg) scale(1)',
+                      filter: 'hue-rotate(360deg) brightness(1) saturate(1)'
+                    }
+                  ], {
+                    duration: 1500,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                  });
+                  
+                  // Cleanup effects
+                  setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                    button.style.filter = 'none';
+                    if (flash.parentNode) {
+                      flash.parentNode.removeChild(flash);
+                    }
+                    
+                    // Reset body styles to restore scrolling
+                    document.body.style.transform = 'none';
+                    document.body.style.transformOrigin = 'initial';
+                    document.body.style.filter = 'none';
+                    
+                    // Scroll back to top of page
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }, 2000);
+                  
+                  if (gameContainer) {
+                    // Remove any existing video
+                    const existingVideo = gameContainer.querySelector('video');
+                    if (existingVideo) {
+                      existingVideo.remove();
+                    }
+                    
+                    // Create the main video
+                    const video = document.createElement('video');
+                    video.src = '/mambo_running.gif.mp4';
+                    video.autoplay = true;
+                    video.loop = true;
+                    video.muted = true;
+                    video.style.position = 'fixed';
+                    video.style.top = '50%';
+                    video.style.left = '50%';
+                    video.style.transform = 'translate(-50%, -50%)';
+                    video.style.zIndex = '9999';
+                    video.style.maxWidth = '300px';
+                    video.style.maxHeight = '300px';
+                    video.style.borderRadius = '12px';
+                    video.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+                    video.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                    video.style.padding = '20px';
+                    document.body.appendChild(video);
+                    
+                    // Create MASSIVE chaotic banana explosion from button
+                    const bananaCount = 16;
+                    const bananas = [];
+                    const buttonRect = event.target.getBoundingClientRect();
+                    const centerX = buttonRect.left + buttonRect.width / 2;
+                    const centerY = buttonRect.top + buttonRect.height / 2;
+                    
+                    for (let i = 0; i < bananaCount; i++) {
+                      const banana = document.createElement('div');
+                      banana.style.position = 'fixed';
+                      banana.style.left = `${centerX}px`;
+                      banana.style.top = `${centerY}px`;
+                      banana.style.width = '120px';
+                      banana.style.height = '120px';
+                      banana.style.pointerEvents = 'none';
+                      banana.style.zIndex = '9998';
+                      banana.style.transformOrigin = 'center';
+                      
+                      // Calculate explosion direction (360 degrees)
+                      const angle = (i / bananaCount) * 360 + Math.random() * 45 - 22.5; // More randomness
+                      const distance = 400 + Math.random() * 300; // Much bigger explosion 400-700px
+                      const endX = centerX + Math.cos(angle * Math.PI / 180) * distance;
+                      const endY = centerY + Math.sin(angle * Math.PI / 180) * distance;
+                      
+                      // Create MASSIVE explosion animation
+                      const animation = banana.animate([
+                        { 
+                          transform: 'translate(0, 0) rotate(0deg) scale(1.2)',
+                          opacity: 1
+                        },
+                        { 
+                          transform: `translate(${endX - centerX}px, ${endY - centerY}px) rotate(1080deg) scale(0.8)`,
+                          opacity: 1
+                        }
+                      ], {
+                        duration: 2000 + Math.random() * 1000, // 2-3 seconds for bigger effect
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                      });
+                      
+                      const img = document.createElement('img');
+                      img.src = '/banana-28.svg';
+                      img.alt = 'MASSIVE Exploding banana';
+                      img.style.width = '100%';
+                      img.style.height = '100%';
+                      img.style.objectFit = 'contain';
+                      img.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))';
+                      
+                      banana.appendChild(img);
+                      document.body.appendChild(banana);
+                      bananas.push(banana);
+                      
+                      // Remove banana when animation completes
+                      animation.addEventListener('finish', () => {
+                        if (banana.parentNode) {
+                          banana.parentNode.removeChild(banana);
+                        }
+                      });
+                    }
+                    
+                    // Remove video and bananas after 5 seconds
+                    setTimeout(() => {
+                      if (video.parentNode) {
+                        video.parentNode.removeChild(video);
+                      }
+                      bananas.forEach(banana => {
+                        if (banana.parentNode) {
+                          banana.parentNode.removeChild(banana);
+                        }
+                      });
+                    }, 5000);
+                  }
+                }}
+                className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg border-2 border-black hover-jiggle transition-colors"
+                style={{
+                  boxShadow: "0 6px 12px rgba(0,0,0,.28)",
+                  WebkitTextStroke: "1px #000000",
+                  paintOrder: "stroke fill"
+                }}
+              >
+                🎮 Mambo No. 5
+              </button>
             </div>
           </div>
         </div>
@@ -1049,7 +1315,12 @@ export default function Page() {
               <div>
                           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('partners-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            style={{ 
+              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+              WebkitTextStroke: "2px #000000",
+              textStroke: "2px #000000",
+              paintOrder: "stroke fill"
+            }}
             data-scroll-id="partners-title"
           >
             PARTNERS
@@ -1120,10 +1391,7 @@ export default function Page() {
         </div>
       </footer>
 
-      {/* ================= FALLING BANANAS ================= */}
-      {hasTriggered && bananaData.map((banana, index) => (
-        <FallingBanana key={index} left={banana.left} delay={banana.delay} />
-      ))}
+      {/* Removed scroll-triggered falling bananas */}
     </div>
   );
 }

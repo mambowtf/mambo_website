@@ -189,6 +189,18 @@ iframe { max-width: 100%; display: block; }
   pointer-events: none;
   z-index: 1000;
   animation: fallBanana 3s linear forwards;
+  opacity: 0;
+}
+
+.banana-fall.animate {
+  opacity: 1;
+}
+
+/* Text stroke support for all browsers */
+.text-stroke {
+  -webkit-text-stroke: 2px #000000;
+  text-stroke: 2px #000000;
+  paint-order: stroke fill;
 }
 
 /* Removed conflicting nth-child rules - using inline delays instead */
