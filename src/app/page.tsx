@@ -32,7 +32,7 @@ const SITE = {
 const FIXED_CHART_SYMBOL = "UNISWAP:MAMBOWETH_EEAD66.USD";
 
 // Assets in /public
-const HERO_BG = "/hero-section0.png";
+const HERO_BG = "/hero-section1.jpg";
 const MEMES_BG = "/memes_section.png";
 
 /**
@@ -192,6 +192,7 @@ function ensureTwitterWidgets(): Promise<any> {
 function TweetWall({ ids }: { ids: string[] }) {
   const holdersRef = useRef<Record<string, HTMLElement | null>>({});
   const createdRef = useRef<Set<string>>(new Set());
+  const [failedTweets, setFailedTweets] = useState<Set<string>>(new Set());
 
   const attachHolder = useCallback(
     (id: string) => (el: HTMLElement | null) => {
@@ -209,19 +210,50 @@ function TweetWall({ ids }: { ids: string[] }) {
 
       const createAll = () => {
         ids.forEach(async (id) => {
-          if (createdRef.current.has(id)) return;
+          if (createdRef.current.has(id) || failedTweets.has(id)) return;
           const el = holdersRef.current[id];
           if (!el) return;
           try {
             el.innerHTML = "";
             await tw.widgets.createTweet(id, el, {
-              theme: "light",
+              theme: "dark",
               align: "center",
               dnt: true,
+              width: 400,
+              chrome: "noheader nofooter noborders",
             });
             createdRef.current.add(id);
-          } catch {
-            // ignore single failures, we'll retry below
+          } catch (error) {
+            console.warn(`Failed to load tweet ${id}:`, error);
+            // Retry once after a delay
+            setTimeout(async () => {
+              try {
+                if (holdersRef.current[id] && !createdRef.current.has(id)) {
+                  await tw.widgets.createTweet(id, holdersRef.current[id], {
+                    theme: "dark",
+                    align: "center",
+                    dnt: true,
+                    width: 400,
+                    chrome: "noheader nofooter noborders",
+                  });
+                  createdRef.current.add(id);
+                }
+              } catch (retryError) {
+                console.warn(`Retry failed for tweet ${id}:`, retryError);
+                setFailedTweets(prev => new Set([...prev, id]));
+                // Add fallback content
+                if (holdersRef.current[id]) {
+                  holdersRef.current[id].innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-family: system-ui; background: #1a1a1a; border-radius: 8px;">
+                      <div style="text-align: center;">
+                        <div style="font-size: 18px; margin-bottom: 8px;">🐦</div>
+                        <div style="font-size: 14px;">Tweet unavailable</div>
+                      </div>
+                    </div>
+                  `;
+                }
+              }
+            }, 2000);
           }
         });
       };
@@ -231,21 +263,29 @@ function TweetWall({ ids }: { ids: string[] }) {
       // Retry a few times in case some holders weren't mounted yet
       let tries = 0;
       const tick = setInterval(() => {
-        if (cancelled || createdRef.current.size >= ids.length || tries++ > 10) {
+        if (cancelled || createdRef.current.size >= ids.length || tries++ > 8) {
           clearInterval(tick);
         } else {
           createAll();
         }
-      }, 500);
+      }, 1000);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [ids]);
+  }, [ids, failedTweets]);
 
-  // Carousel logic (2 tweets per page)
-  const STEP = 2;
+  // Carousel logic (responsive: 1 tweet on mobile, 2 on desktop)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  const STEP = isMobile ? 1 : 2;
   const pages = Math.max(1, Math.ceil(ids.length / STEP));
   const [page, setPage] = useState(0);
   const next = useCallback(() => setPage((p) => (p + 1) % pages), [pages]);
@@ -267,19 +307,19 @@ function TweetWall({ ids }: { ids: string[] }) {
             const slice = ids.slice(pi * STEP, pi * STEP + STEP);
             return (
               <div key={pi} className="w-full shrink-0 px-0">
-                <div className="grid grid-cols-2 gap-6">
+                <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   {slice.map((id) => (
                     <div
                       key={id}
-                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-white text-black p-4 shadow-[0_14px_30px_rgba(0,0,0,.25)]"
+                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-white text-black p-4 shadow-[0_14px_30px_rgba(0,0,0,.25)] h-[500px] md:h-[600px] flex flex-col"
                     >
                       <div
                         ref={attachHolder(id)}
-                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto"
+                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto flex-1 flex items-center justify-center"
                       />
                     </div>
                   ))}
-                  {slice.length === 1 && (
+                  {!isMobile && slice.length === 1 && (
                     <div className="rounded-2xl border-[3px] md:border-4 border-transparent" />
                   )}
                 </div>
@@ -377,11 +417,102 @@ function TradingViewChart({ symbol }: { symbol: string }) {
   );
 }
 
+/* ============================== FALLING BANANAS ============================== */
+
+function FallingBanana({ left, delay }: { left: number; delay: number }) {
+  return (
+    <div 
+      className="banana-fall"
+      style={{ 
+        left: `${left}%`,
+        animationDelay: `${delay}s`
+      }}
+    >
+      <img
+        src="/banana-28.svg"
+        alt="Falling banana"
+        width="80"
+        height="80"
+        style={{
+          filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
+        }}
+      />
+    </div>
+  );
+}
+
+function useFallingBananas() {
+  const [hasTriggered, setHasTriggered] = useState(false);
+
+  const startBananaRain = useCallback(() => {
+    if (hasTriggered) return;
+    setHasTriggered(true);
+  }, [hasTriggered]);
+
+  // Random banana positions and delays - no DOM manipulation
+  const bananaData = [
+    { left: 10, delay: 0 },
+    { left: 65, delay: 0.3 },
+    { left: 25, delay: 0.7 },
+    { left: 80, delay: 1.1 },
+    { left: 45, delay: 1.4 },
+    { left: 15, delay: 1.8 },
+    { left: 70, delay: 2.2 },
+    { left: 35, delay: 2.6 },
+    { left: 55, delay: 3.0 },
+    { left: 20, delay: 3.4 }
+  ];
+
+  return { hasTriggered, startBananaRain, bananaData };
+}
+
+/* ============================== SCROLL ANIMATIONS ============================== */
+
+function useScrollAnimation() {
+  const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-scroll-id');
+            if (id) {
+              setVisibleElements(prev => new Set([...prev, id]));
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    const elements = document.querySelectorAll('[data-scroll-id]');
+    elements.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  return visibleElements;
+}
+
 /* ============================== PAGE ============================== */
 
 export default function Page() {
   // Lightbox uses the full MEME_POOL so you can step through *all* images
   const lb = useLightbox(MEME_POOL.length);
+  
+  // Scroll animations
+  const visibleElements = useScrollAnimation();
+  
+  // Falling bananas
+  const { hasTriggered, startBananaRain, bananaData } = useFallingBananas();
+  
+  // Trigger banana rain when memes section comes into view
+  useEffect(() => {
+    if (visibleElements.has('memes-section')) {
+      startBananaRain();
+    }
+  }, [visibleElements, startBananaRain]);
 
   // ===== Copy CA button =====
   const [copied, setCopied] = useState(false);
@@ -448,68 +579,137 @@ export default function Page() {
 
       {/* ================= HERO ================= */}
       <section
-        id="top"
-        className="relative overflow-hidden"
+        className="relative overflow-hidden h-[95vh]"
         style={{
           backgroundImage: `url(${HERO_BG})`,
           backgroundSize: "cover",
-          backgroundPosition: "center top",
-          minHeight: "100vh",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
         }}
       >
-        {SIGN_LINKS.map(({ key, label, href }) => {
-          const r = HERO_HITBOXES[key];
-          const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
-          const style: CSSProperties = {
-            position: "absolute",
-            left: r.left,
-            top: r.top,
-            width: r.width,
-            height: r.height,
-            transform: `rotate(${r.rot || "0deg"})`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 16,
-            border: "4px solid #0f0f0f",
-            background: palette.bg,
-            color: palette.color,
-            boxShadow: "0 12px 24px rgba(0,0,0,.28)",
-            textDecoration: "none",
-            cursor: "pointer",
-            userSelect: "none",
-            overflow: "hidden",
-            paddingInline: "0.5vw",
-          };
-          return (
-            <a
-              key={key}
-              href={href}
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label={label}
-              style={style}
-              className="select-none"
-            >
-              <span
-                className={`${luckiest.className} font-black leading-none`}
-                style={{
-                  fontSize: "clamp(10px, 0.9vw + 7px, 16px)",
-                  letterSpacing: 0.5,
-                  textShadow: "0 2px 0 rgba(0,0,0,.35)",
-                  whiteSpace: "nowrap",
-                }}
+        {/* Hero buttons - Desktop */}
+        <div className="hidden md:block">
+          {SIGN_LINKS.map(({ key, label, href }) => {
+            const r = HERO_HITBOXES[key];
+            const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
+            const style: CSSProperties = {
+              position: "absolute",
+              left: r.left,
+              top: r.top,
+              width: r.width,
+              height: r.height,
+              transform: `rotate(${r.rot || "0deg"})`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 16,
+              border: "4px solid #0f0f0f",
+              background: palette.bg,
+              color: palette.color,
+              boxShadow: "0 12px 24px rgba(0,0,0,.28)",
+              textDecoration: "none",
+              cursor: "pointer",
+              userSelect: "none",
+              overflow: "hidden",
+              paddingInline: "1vw",
+              minWidth: "120px",
+              minHeight: "50px",
+              transform: `rotate(${r.rot || "0deg"}) scale(0.8)`,
+            };
+            return (
+              <a
+                key={key}
+                href={href}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={label}
+                style={style}
+                className="select-none hover-jiggle"
               >
-                {label}
-              </span>
-            </a>
-          );
-        })}
+                <span
+                  className={`${luckiest.className} font-black leading-none`}
+                  style={{
+                    fontSize: "clamp(10px, 0.9vw + 7px, 16px)",
+                    letterSpacing: 0.5,
+                    textShadow: "0 2px 0 rgba(0,0,0,.35)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+
+        {/* MAMBO Logo Overlay - Mobile (where buttons were) */}
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[2%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
+          <img
+            src="/herotext.jpg"
+            alt="$MAMBO THE GORILLA"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              transform: "scale(2.2)",
+              filter: "drop-shadow(0 5px 10px rgba(0,0,0,0.5))",
+            }}
+          />
+        </div>
+
+        {/* MAMBO Logo Overlay - Desktop */}
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[15%] text-center hidden md:block" style={{ width: "100vw", height: "510px" }}>
+          <img
+            src="/herotext.jpg"
+            alt="$MAMBO THE GORILLA"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              transform: "scale(1.265)",
+              filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.5))",
+            }}
+          />
+        </div>
+
+        {/* Hero buttons - Mobile (where text was) */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-[12%] text-center md:hidden">
+          <div className="flex gap-3 max-w-[95vw] mx-auto px-4">
+            {SIGN_LINKS.map(({ key, label, href }) => {
+              const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
+              return (
+                <a
+                  key={key}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={label}
+                  className="select-none hover-jiggle rounded-xl border-2 border-black text-center flex-1"
+                  style={{
+                    background: palette.bg,
+                    color: palette.color,
+                    boxShadow: "0 6px 12px rgba(0,0,0,.28)",
+                    textDecoration: "none",
+                    minHeight: "48px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "clamp(12px, 3vw, 16px)",
+                    fontWeight: "600",
+                    padding: "8px 16px",
+                  }}
+                >
+                  {label}
+                </a>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Contract banner with tiny copy button */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[9%] w-[min(1600px,96vw)] px-4">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[5%] w-[min(960px,95vw)] px-2 md:px-4">
           <div
-            className="relative rounded-[28px] text-center overflow-hidden"
+            className="relative rounded-[28px] flex items-center justify-between px-4 md:px-6 py-3 md:py-5"
             style={{
               background: "#a87450",
               border: "6px solid #0f0f0f",
@@ -518,15 +718,16 @@ export default function Page() {
             }}
           >
             <span
-              className={`${luckiest.className} block leading-none mx-auto py-4 md:py-5 px-10`}
+              className={`${luckiest.className} leading-none flex-1 text-center`}
               style={{
-                fontSize: "clamp(25px, 2.4vw + 10px, 48px)",
+                fontSize: "clamp(11px, 1.4vw + 5px, 39px)",
                 color: "#ffffff",
-                WebkitTextStroke: "4px #0f0f0f",
+                WebkitTextStroke: "2px #0f0f0f",
                 paintOrder: "stroke fill",
                 textShadow: "0 4px 0 rgba(0,0,0,.35)",
                 letterSpacing: "0.01em",
-                whiteSpace: "nowrap",
+                wordBreak: "break-all",
+                paddingRight: "12px",
               }}
             >
               CA: {SITE.TOKEN.contract}
@@ -536,11 +737,11 @@ export default function Page() {
             <button
               onClick={onCopy}
               aria-label="Copy CA"
-              className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-md border-2 border-black bg-white w-9 h-9 hover:scale-105 active:scale-95 transition"
+              className="inline-flex items-center justify-center rounded-md border-2 border-black bg-white w-8 h-8 md:w-9 md:h-9 hover:scale-105 active:scale-95 transition flex-shrink-0 hover-jiggle"
               title={copied ? "Copied!" : "Copy CA"}
             >
               {copied ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="md:w-5 md:h-5">
                   <path
                     d="M20 6L9 17l-5-5"
                     stroke="black"
@@ -550,7 +751,7 @@ export default function Page() {
                   />
                 </svg>
               ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="md:w-5 md:h-5">
                   <rect
                     x="9"
                     y="9"
@@ -577,14 +778,37 @@ export default function Page() {
         </div>
       </section>
 
+      {/* ================= TEXT SLIDER ================= */}
+      <section className="py-[0.85rem] overflow-hidden" style={{ backgroundColor: "#085EB2" }}>
+        <div className="relative">
+          <div className="flex animate-scroll whitespace-nowrap">
+            <div className="flex items-center space-x-8 text-white">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`${luckiest.className} text-xl md:text-3xl font-bold`}
+                  style={{
+                    fontSize: "clamp(16px, 3.2vw, 28px)",
+                    color: "#ffffff",
+                    textShadow: "2px 2px 0 #000",
+                  }}
+                >
+                  NEW WEBSITE LIVE
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ================= MEMES (2×2 grid, auto-rotating, NO CTA) ================= */}
       <section
         id="memes"
-        className="relative"
+        className="relative pt-16"
+        data-scroll-id="memes-section"
         style={{
           height: "100vh",
           backgroundImage: `url(${MEMES_BG})`,
-          backgroundSize: "cover",
           backgroundPosition: "center bottom",
           backgroundRepeat: "no-repeat",
           ["--reserveVH" as any]: "28vh",
@@ -592,7 +816,7 @@ export default function Page() {
       >
         <div className="mx-auto w-[92vw] max-w-[1340px] h-full flex flex-col">
           <div
-            className="rounded-[28px] border-[6px] border-neutral-900 shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-[#a87450]/95 px-5 md:px-8 lg:px-10 py-5 md:py-7 lg:py-8 mt-5 overflow-hidden"
+            className="rounded-[28px] border-[6px] border-white shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-[#0A84FF] px-5 md:px-8 lg:px-10 py-5 md:py-7 lg:py-8 mt-5 overflow-hidden"
             style={{
               boxShadow:
                 "0 18px 40px rgba(0,0,0,.35), inset 0 6px 0 rgba(255,255,255,.2), inset 0 -7px 0 rgba(0,0,0,.22)",
@@ -613,7 +837,7 @@ export default function Page() {
                   <button
                     key={`${poolIdx}-${page}`} // forces refresh when page changes
                     onClick={() => lb.openAt(poolIdx)}
-                    className="rounded-[16px] overflow-hidden border-4 border-neutral-900 shadow-[0_12px_26px_rgba(0,0,0,.28)] focus:outline-none focus:ring-2 focus:ring-black/40"
+                    className="rounded-[16px] overflow-hidden border-4 border-neutral-900 shadow-[0_12px_26px_rgba(0,0,0,.28)] focus:outline-none focus:ring-2 focus:ring-black/40 hover-jiggle"
                   >
                     <img
                       src={img.src}
@@ -643,8 +867,9 @@ export default function Page() {
       <section id="community" className="py-16" style={{ background: "black" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
-            className={`${luckiest.className} text-white leading-none`}
+            className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('community-title') ? 'animate-slide-in-up' : ''}`}
             style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            data-scroll-id="community-title"
           >
             Our Community is Always Active
           </h2>
@@ -659,8 +884,9 @@ export default function Page() {
       <section id="whitepaper" className="bg-black text-white py-16">
         <div className="mx-auto w-[92vw] max-w-[1340px]">
           <h2
-            className={`${luckiest.className} text-white leading-none mb-6`}
+            className={`${luckiest.className} text-white leading-none mb-6 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
             style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            data-scroll-id="whitepaper-title"
           >
             Whitepaper
           </h2>
@@ -681,7 +907,7 @@ export default function Page() {
                 </p>
 
                 <a
-                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-black text-white border-2 border-white px-5 py-3"
+                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-black text-white border-2 border-white px-5 py-3 hover-jiggle"
                   href={SITE.whitepaperUrl}
                 >
                   <span>Coming Soon</span>
@@ -696,8 +922,9 @@ export default function Page() {
       <section id="extra-howbuy" className="bg-black text-white py-16">
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
-            className={`${luckiest.className} text-white leading-none`}
+            className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('lore-title') ? 'animate-slide-in-up' : ''}`}
             style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            data-scroll-id="lore-title"
           >
             Mambo Lore
           </h2>
@@ -756,8 +983,9 @@ export default function Page() {
       <section id="live-chart" className="bg-black text-white py-16">
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
-            className={`${luckiest.className} text-white leading-none`}
+            className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('chart-title') ? 'animate-slide-in-up' : ''}`}
             style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            data-scroll-id="chart-title"
           >
             Live Chart
           </h2>
@@ -771,8 +999,9 @@ export default function Page() {
       <section id="extra-howbuy-2" className="bg-black text-white py-16">
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
-            className={`${luckiest.className} text-white leading-none`}
+            className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-slide-in-up' : ''}`}
             style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            data-scroll-id="howbuy-title"
           >
             How to Buy
           </h2>
@@ -818,12 +1047,13 @@ export default function Page() {
           <div className="flex flex-col gap-10">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
               <div>
-                <h2
-                  className={`${luckiest.className} text-white leading-none`}
-                  style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
-                >
-                  PARTNERS
-                </h2>
+                          <h2
+            className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('partners-title') ? 'animate-slide-in-up' : ''}`}
+            style={{ fontSize: "clamp(44px, 3.6vw + 16px, 72px)" }}
+            data-scroll-id="partners-title"
+          >
+            PARTNERS
+          </h2>
                 <p className="text-white/90 text-xl md:text-2xl mt-6 tracking-[0.2em]">
                   We collaborate with brands worldwide.
                 </p>
@@ -853,7 +1083,7 @@ export default function Page() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-xl border-4 border-white bg-[#0A84FF] h-16 md:h-20 flex items-center justify-center p-2"
+                  className="rounded-xl border-4 border-white bg-[#0A84FF] h-16 md:h-20 flex items-center justify-center p-2 hover-jiggle"
                   aria-label={alt}
                   title={alt}
                 >
@@ -869,7 +1099,7 @@ export default function Page() {
 
               <a
                 href={SITE.partnersCtaUrl}
-                className="rounded-xl border-2 border-white text-white px-6 h-16 md:h-20 flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-1"
+                className="rounded-xl border-2 border-white text-white px-6 h-16 md:h-20 flex items-center justify-between col-span-1 md:col-span-2 lg:col-span-1 hover-jiggle"
               >
                 <span className="text-lg font-semibold">
                   Contact us for collaboration
@@ -889,6 +1119,11 @@ export default function Page() {
           © {new Date().getFullYear()} MAMBO LLC · NFA · DYOR · WAGMI
         </div>
       </footer>
+
+      {/* ================= FALLING BANANAS ================= */}
+      {hasTriggered && bananaData.map((banana, index) => (
+        <FallingBanana key={index} left={banana.left} delay={banana.delay} />
+      ))}
     </div>
   );
 }

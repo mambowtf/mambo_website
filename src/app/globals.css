@@ -14,5 +14,227 @@ img { max-width: 100%; height: auto; }
 /* Make iframes (tweets / TV widget) never overflow parents */
 iframe { max-width: 100%; display: block; }
 
-/* Ensure any grid/flex panel we forgot won’t spill content at zoom */
+/* Ensure any grid/flex panel we forgot won't spill content at zoom */
 .min-h-0, .overflow-hidden { min-height: 0; }
+
+/* Text slider animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+
+/* Jiggle animation */
+@keyframes jiggle {
+  0%, 100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(-1px) translateY(-1px) rotate(-0.5deg);
+  }
+  20% {
+    transform: translateX(1px) translateY(1px) rotate(0.5deg);
+  }
+  30% {
+    transform: translateX(-1px) translateY(1px) rotate(-0.3deg);
+  }
+  40% {
+    transform: translateX(1px) translateY(-1px) rotate(0.3deg);
+  }
+  50% {
+    transform: translateX(-0.5px) translateY(-0.5px) rotate(-0.2deg);
+  }
+  60% {
+    transform: translateX(0.5px) translateY(0.5px) rotate(0.2deg);
+  }
+  70% {
+    transform: translateX(-0.3px) translateY(0.3px) rotate(-0.1deg);
+  }
+  80% {
+    transform: translateX(0.3px) translateY(-0.3px) rotate(0.1deg);
+  }
+  90% {
+    transform: translateX(-0.1px) translateY(-0.1px) rotate(-0.05deg);
+  }
+}
+
+.animate-jiggle {
+  animation: jiggle 0.5s ease-in-out infinite;
+}
+
+.animate-jiggle-slow {
+  animation: jiggle 2s ease-in-out infinite;
+}
+
+.animate-jiggle-delayed {
+  animation: jiggle 1.5s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+/* Hover-only jiggle animations */
+.hover-jiggle:hover {
+  animation: jiggle 0.5s ease-in-out infinite;
+}
+
+.hover-jiggle-slow:hover {
+  animation: jiggle 2s ease-in-out infinite;
+}
+
+/* Scroll animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.8s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.6s ease-out forwards;
+}
+
+/* Initially hidden for scroll animations */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(60px);
+}
+
+.scroll-animate-left {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+.scroll-animate-right {
+  opacity: 0;
+  transform: translateX(60px);
+}
+
+.scroll-animate-scale {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Falling bananas animation */
+@keyframes fallBanana {
+  0% {
+    transform: translateY(-200px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh + 200px)) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+.banana-fall {
+  position: fixed;
+  top: -200px;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1000;
+  animation: fallBanana 3s linear forwards;
+}
+
+/* Removed conflicting nth-child rules - using inline delays instead */
+
+/* -------------------------------------------
+   RESPONSIVE BACKGROUND FIXES
+   ------------------------------------------- */
+
+/* Hero section - original cover sizing */
+#top {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
+  min-height: 100vh !important;
+  height: 100vh !important;
+}
+
+/* Memes section - keep original scaling */
+#memes {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Mobile adjustments for memes section only */
+@media (max-width: 768px) {
+  #memes {
+    background-size: 150% auto !important;
+    background-position: center center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #memes {
+    background-size: 200% auto !important;
+    background-position: center center !important;
+    background-attachment: scroll !important;
+  }
+}
+
+/* Mobile button sizing fixes */
+@media (max-width: 768px) {
+  #top a[style*="position: absolute"] {
+    min-width: 140px !important;
+    min-height: 60px !important;
+    padding: 8px 12px !important;
+  }
+}
