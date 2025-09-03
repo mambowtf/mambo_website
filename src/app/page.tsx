@@ -220,7 +220,7 @@ function TweetWall({ ids }: { ids: string[] }) {
               theme: "dark",
               align: "center",
               dnt: true,
-              width: 400,
+              width: Math.min(500, el.offsetWidth - 16),
               chrome: "noheader nofooter noborders",
             });
             createdRef.current.add(id);
@@ -234,7 +234,7 @@ function TweetWall({ ids }: { ids: string[] }) {
                     theme: "dark",
                     align: "center",
                     dnt: true,
-                    width: 400,
+                    width: Math.min(500, holdersRef.current[id]!.offsetWidth - 16),
                     chrome: "noheader nofooter noborders",
                   });
                   createdRef.current.add(id);
@@ -312,11 +312,11 @@ function TweetWall({ ids }: { ids: string[] }) {
                   {slice.map((id) => (
                     <div
                       key={id}
-                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-white text-black p-4 shadow-[0_14px_30px_rgba(0,0,0,.25)] h-[500px] md:h-[600px] flex flex-col"
+                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-transparent text-black p-2 shadow-[0_14px_30px_rgba(0,0,0,.25)] min-h-[400px] md:min-h-[500px] flex flex-col"
                     >
                       <div
                         ref={attachHolder(id)}
-                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto flex-1 flex items-center justify-center"
+                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:max-w-full flex-1 flex items-center justify-center overflow-hidden"
                       />
                     </div>
                   ))}
@@ -658,7 +658,7 @@ export default function Page() {
         </div>
 
         {/* MAMBO Logo Overlay - Mobile (where buttons were) */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[2%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[8%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
           <img
             src="/herotext.jpg"
             alt="$MAMBO THE GORILLA"
@@ -744,7 +744,7 @@ export default function Page() {
                 paintOrder: "stroke fill",
                 textShadow: "0 4px 0 rgba(0,0,0,.35)",
                 letterSpacing: "0.01em",
-                wordBreak: "break-all",
+                whiteSpace: "nowrap",
                 paddingRight: "12px",
               }}
             >
@@ -890,7 +890,7 @@ export default function Page() {
       </section>
 
       {/* ================= COMMUNITY ================= */}
-      <section id="community" className="py-16" style={{ background: "black" }}>
+      <section id="community" className="py-8" style={{ background: "black" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('community-title') ? 'animate-slide-in-up' : ''}`}
@@ -912,7 +912,7 @@ export default function Page() {
       </section>
 
       {/* ================= WHITEPAPER (between lore and chart) ================= */}
-      <section id="whitepaper" className="bg-black text-white py-16">
+      <section id="whitepaper" className="bg-black text-white py-8">
         <div className="mx-auto w-[92vw] max-w-[1340px]">
           <h2
             className={`${luckiest.className} text-white leading-none mb-6 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
@@ -929,11 +929,27 @@ export default function Page() {
 
           <div className="rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,.65)] p-6 md:p-10">
             <div className="grid grid-cols-1 md:grid-cols-[360px_1fr] items-center gap-8">
-              <img
-                src="/mambo-body-10-whitepaper.png"
-                alt="Gorilla illustration"
-                className="w-full md:w-[340px] mx-auto"
-              />
+              <div className="relative">
+                <img
+                  src="/mambo-body-10.png"
+                  alt="Gorilla illustration"
+                  className={`w-full md:w-[340px] mx-auto scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
+                />
+                {/* Speech bubble that appears naturally after gorilla */}
+                <div 
+                  className={`absolute -top-8 -right-4 bg-white rounded-2xl px-4 py-2 shadow-lg border-2 border-black ${visibleElements.has('whitepaper-title') ? 'animate-speech-bubble' : 'opacity-0'}`}
+                  style={{
+                    animationDelay: '0.8s'
+                  }}
+                >
+                  <div className="text-black font-bold text-sm whitespace-nowrap">
+                    Never Sell! 🦍
+                  </div>
+                  {/* Speech bubble tail */}
+                  <div className="absolute bottom-[-8px] left-4 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-white"></div>
+                  <div className="absolute bottom-[-10px] left-[15px] w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-black"></div>
+                </div>
+              </div>
               <div className="text-white">
                 <p
                   className={`${luckiest.className} leading-tight`}
@@ -960,7 +976,7 @@ export default function Page() {
       </section>
 
       {/* ================= 3 CARDS ================= */}
-      <section id="extra-howbuy" className="bg-black text-white py-16">
+      <section id="extra-howbuy" className="bg-black text-white py-8">
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('lore-title') ? 'animate-slide-in-up' : ''}`}
@@ -1026,7 +1042,7 @@ export default function Page() {
       </section>
 
       {/* ================= PRICE ACTION (no search; fixed symbol) ================= */}
-      <section id="live-chart" className="bg-black text-white py-16">
+      <section id="live-chart" className="bg-black text-white py-8">
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('chart-title') ? 'animate-slide-in-up' : ''}`}
@@ -1047,7 +1063,7 @@ export default function Page() {
       </section>
 
       {/* ================= HOW TO BUY ================= */}
-      <section id="extra-howbuy-2" className="bg-black text-white py-16">
+      <section id="extra-howbuy-2" className="bg-black text-white py-8">
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-slide-in-up' : ''}`}
@@ -1062,8 +1078,8 @@ export default function Page() {
             How to Buy
           </h2>
 
-          <div className="rounded-2xl border-4 border-white bg-[#0A84FF] px-4 py-4 shadow-[0_18px_40px_rgba(0,0,0,.35)]">
-            <div className="grid grid-cols-1 md:grid-cols-4 text-center font-extrabold divide-y md:divide-y-0 md:divide-x-2 divide-white/70">
+          <div className={`rounded-2xl border-4 border-white bg-[#0A84FF] px-4 py-4 shadow-[0_18px_40px_rgba(0,0,0,.35)] scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-flip-down' : ''}`}>
+            <div className="grid grid-cols-2 md:grid-cols-4 text-center font-extrabold divide-y divide-x-2 md:divide-y-0 divide-white/70">
               {[
                 ["Step 1", "Download Metamask Wallet"],
                 ["Step 2", "Load up ETH from an Exchange"],
@@ -1100,207 +1116,63 @@ export default function Page() {
               </div>
               <button
                 onClick={(event) => {
-                  const button = event.target as HTMLButtonElement;
-                  const gameContainer = document.getElementById('game');
+                  // Create MASSIVE chaotic banana explosion from button
+                  const bananaCount = 16;
+                  const bananas: HTMLElement[] = [];
+                  const buttonRect = (event.target as HTMLButtonElement).getBoundingClientRect();
+                  const centerX = buttonRect.left + buttonRect.width / 2;
+                  const centerY = buttonRect.top + buttonRect.height / 2;
                   
-                  // Add CHAOS to the button itself!
-                  button.style.animation = 'none';
-                  button.style.transform = 'scale(1.1)';
-                  button.style.filter = 'hue-rotate(180deg) brightness(1.5)';
-                  
-                  // Chaotic button shake
-                  const shakeAnimation = button.animate([
-                    { transform: 'translate(0, 0) rotate(0deg) scale(1.1)' },
-                    { transform: 'translate(-5px, -5px) rotate(-5deg) scale(1.2)' },
-                    { transform: 'translate(5px, -3px) rotate(5deg) scale(1.1)' },
-                    { transform: 'translate(-3px, 5px) rotate(-3deg) scale(1.3)' },
-                    { transform: 'translate(3px, 3px) rotate(3deg) scale(1.1)' },
-                    { transform: 'translate(0, 0) rotate(0deg) scale(1.1)' }
-                  ], {
-                    duration: 500,
-                    iterations: 3
-                  });
-                  
-                  // Add screen flash effect
-                  const flash = document.createElement('div');
-                  flash.style.position = 'fixed';
-                  flash.style.top = '0';
-                  flash.style.left = '0';
-                  flash.style.width = '100vw';
-                  flash.style.height = '100vh';
-                  flash.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
-                  flash.style.zIndex = '9997';
-                  flash.style.pointerEvents = 'none';
-                  document.body.appendChild(flash);
-                  
-                  // Flash animation
-                  const flashAnimation = flash.animate([
-                    { opacity: 0 },
-                    { opacity: 1 },
-                    { opacity: 0 }
-                  ], {
-                    duration: 200,
-                    iterations: 2
-                  });
-                  
-                  // Screen shake effect
-                  document.body.style.animation = 'none';
-                  const screenShake = document.body.animate([
-                    { transform: 'translate(0, 0)' },
-                    { transform: 'translate(-2px, -2px)' },
-                    { transform: 'translate(2px, -1px)' },
-                    { transform: 'translate(-1px, 2px)' },
-                    { transform: 'translate(1px, 1px)' },
-                    { transform: 'translate(0, 0)' }
-                  ], {
-                    duration: 100,
-                    iterations: 5
-                  });
-                  
-
-                  
-                  // SCREEN WARP EFFECT (360° rotation around center)
-                  // Use body directly instead of wrapper to avoid scrolling issues
-                  document.body.style.transformOrigin = 'center center';
-                  const websiteWarp = document.body.animate([
-                    { 
-                      transform: 'rotate(0deg) scale(1)',
-                      filter: 'hue-rotate(0deg) brightness(1) saturate(1)'
-                    },
-                    { 
-                      transform: 'rotate(90deg) scale(1.05)',
-                      filter: 'hue-rotate(90deg) brightness(1.2) saturate(1.5)'
-                    },
-                    { 
-                      transform: 'rotate(180deg) scale(0.95)',
-                      filter: 'hue-rotate(180deg) brightness(0.8) saturate(2)'
-                    },
-                    { 
-                      transform: 'rotate(270deg) scale(1.02)',
-                      filter: 'hue-rotate(270deg) brightness(1.1) saturate(1.8)'
-                    },
-                    { 
-                      transform: 'rotate(360deg) scale(1)',
-                      filter: 'hue-rotate(360deg) brightness(1) saturate(1)'
-                    }
-                  ], {
-                    duration: 1500,
-                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                  });
-                  
-                  // Cleanup effects
-                  setTimeout(() => {
-                    button.style.transform = 'scale(1)';
-                    button.style.filter = 'none';
-                    if (flash.parentNode) {
-                      flash.parentNode.removeChild(flash);
-                    }
+                  for (let i = 0; i < bananaCount; i++) {
+                    const banana = document.createElement('div');
+                    banana.style.position = 'fixed';
+                    banana.style.left = `${centerX}px`;
+                    banana.style.top = `${centerY}px`;
+                    banana.style.width = '80px';
+                    banana.style.height = '80px';
+                    banana.style.pointerEvents = 'none';
+                    banana.style.zIndex = '9998';
+                    banana.style.transformOrigin = 'center';
                     
-                    // Reset body styles to restore scrolling
-                    document.body.style.transform = 'none';
-                    document.body.style.transformOrigin = 'initial';
-                    document.body.style.filter = 'none';
+                    // Calculate explosion direction (360 degrees)
+                    const angle = (i / bananaCount) * 360 + Math.random() * 45 - 22.5; // More randomness
+                    const distance = 200 + Math.random() * 150; // Contained explosion 200-350px
+                    const endX = centerX + Math.cos(angle * Math.PI / 180) * distance;
+                    const endY = centerY + Math.sin(angle * Math.PI / 180) * distance;
                     
-                    // Scroll back to top of page
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }, 2000);
-                  
-                  if (gameContainer) {
-                    // Remove any existing video
-                    const existingVideo = gameContainer.querySelector('video');
-                    if (existingVideo) {
-                      existingVideo.remove();
-                    }
-                    
-                    // Create the main video
-                    const video = document.createElement('video');
-                    video.src = '/mambo_running.gif.mp4';
-                    video.autoplay = true;
-                    video.loop = true;
-                    video.muted = true;
-                    video.style.position = 'fixed';
-                    video.style.top = '50%';
-                    video.style.left = '50%';
-                    video.style.transform = 'translate(-50%, -50%)';
-                    video.style.zIndex = '9999';
-                    video.style.maxWidth = '300px';
-                    video.style.maxHeight = '300px';
-                    video.style.borderRadius = '12px';
-                    video.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
-                    video.style.backgroundColor = 'rgba(0,0,0,0.8)';
-                    video.style.padding = '20px';
-                    document.body.appendChild(video);
-                    
-                    // Create MASSIVE chaotic banana explosion from button
-                    const bananaCount = 16;
-                    const bananas: HTMLElement[] = [];
-                    const buttonRect = (event.target as HTMLButtonElement).getBoundingClientRect();
-                    const centerX = buttonRect.left + buttonRect.width / 2;
-                    const centerY = buttonRect.top + buttonRect.height / 2;
-                    
-                    for (let i = 0; i < bananaCount; i++) {
-                      const banana = document.createElement('div');
-                      banana.style.position = 'fixed';
-                      banana.style.left = `${centerX}px`;
-                      banana.style.top = `${centerY}px`;
-                      banana.style.width = '120px';
-                      banana.style.height = '120px';
-                      banana.style.pointerEvents = 'none';
-                      banana.style.zIndex = '9998';
-                      banana.style.transformOrigin = 'center';
-                      
-                      // Calculate explosion direction (360 degrees)
-                      const angle = (i / bananaCount) * 360 + Math.random() * 45 - 22.5; // More randomness
-                      const distance = 400 + Math.random() * 300; // Much bigger explosion 400-700px
-                      const endX = centerX + Math.cos(angle * Math.PI / 180) * distance;
-                      const endY = centerY + Math.sin(angle * Math.PI / 180) * distance;
-                      
-                      // Create MASSIVE explosion animation
-                      const animation = banana.animate([
-                        { 
-                          transform: 'translate(0, 0) rotate(0deg) scale(1.2)',
-                          opacity: 1
-                        },
-                        { 
-                          transform: `translate(${endX - centerX}px, ${endY - centerY}px) rotate(1080deg) scale(0.8)`,
-                          opacity: 1
-                        }
-                      ], {
-                        duration: 2000 + Math.random() * 1000, // 2-3 seconds for bigger effect
-                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                      });
-                      
-                      const img = document.createElement('img');
-                      img.src = '/banana-28.svg';
-                      img.alt = 'MASSIVE Exploding banana';
-                      img.style.width = '100%';
-                      img.style.height = '100%';
-                      img.style.objectFit = 'contain';
-                      img.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))';
-                      
-                      banana.appendChild(img);
-                      document.body.appendChild(banana);
-                      bananas.push(banana);
-                      
-                      // Remove banana when animation completes
-                      animation.addEventListener('finish', () => {
-                        if (banana.parentNode) {
-                          banana.parentNode.removeChild(banana);
-                        }
-                      });
-                    }
-                    
-                    // Remove video and bananas after 5 seconds
-                    setTimeout(() => {
-                      if (video.parentNode) {
-                        video.parentNode.removeChild(video);
+                    // Create MASSIVE explosion animation
+                    const animation = banana.animate([
+                      { 
+                        transform: 'translate(0, 0) rotate(0deg) scale(1.2)',
+                        opacity: 1
+                      },
+                      { 
+                        transform: `translate(${endX - centerX}px, ${endY - centerY}px) rotate(1080deg) scale(0.8)`,
+                        opacity: 1
                       }
-                      bananas.forEach(banana => {
-                        if (banana.parentNode) {
-                          banana.parentNode.removeChild(banana);
-                        }
-                      });
-                    }, 5000);
+                    ], {
+                      duration: 2000 + Math.random() * 1000, // 2-3 seconds for bigger effect
+                      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    
+                    const img = document.createElement('img');
+                    img.src = '/banana-28.svg';
+                    img.alt = 'MASSIVE Exploding banana';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'contain';
+                    img.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))';
+                    
+                    banana.appendChild(img);
+                    document.body.appendChild(banana);
+                    bananas.push(banana);
+                    
+                    // Remove banana when animation completes
+                    animation.addEventListener('finish', () => {
+                      if (banana.parentNode) {
+                        banana.parentNode.removeChild(banana);
+                      }
+                    });
                   }
                 }}
                 className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg border-2 border-black hover-jiggle transition-colors"
@@ -1335,11 +1207,19 @@ export default function Page() {
           >
             PARTNERS
           </h2>
-                <p className="text-white/90 text-xl md:text-2xl mt-6 tracking-[0.2em]">
-                  We collaborate with brands worldwide.
-                </p>
+                <div className="flex items-center justify-between mt-6">
+                  <p className="text-white/90 text-xl md:text-2xl tracking-[0.2em]">
+                    We collaborate with brands worldwide.
+                  </p>
+                  <div className="flex items-center gap-4 text-white md:hidden">
+                    <div className="text-center">
+                      <div className="text-2xl font-extrabold">50+</div>
+                      <div className="text-white/75 -mt-1 text-sm">Partners</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-10 text-white">
+              <div className="hidden md:flex items-center gap-10 text-white">
                 <div className="h-12 w-px bg-white/30 hidden lg:block" />
                 <div className="text-center">
                   <div className="text-4xl font-extrabold">50+</div>
@@ -1391,6 +1271,27 @@ export default function Page() {
               </a>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ================= BOTTOM GIF & QUOTE ================= */}
+      <section className="bg-black text-white py-16">
+        <div className="mx-auto max-w-[1340px] w-[92vw] text-center">
+          <div className="mb-8">
+            <img 
+              src="/mambo_running.gif.mp4" 
+              alt="Mambo running" 
+              className="mx-auto max-w-[300px] w-full h-auto rounded-lg shadow-2xl"
+            />
+          </div>
+          <blockquote className="text-2xl md:text-4xl font-bold italic text-white max-w-4xl mx-auto">
+            <p className="mb-4">
+              "Keep on running no matter the market."
+            </p>
+            <footer className="text-lg md:text-xl text-white/80">
+              — $MAMBO THE GORILLA
+            </footer>
+          </blockquote>
         </div>
       </section>
 
