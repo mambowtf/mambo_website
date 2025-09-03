@@ -32,20 +32,8 @@ const SITE = {
 const FIXED_CHART_SYMBOL = "UNISWAP:MAMBOWETH_EEAD66.USD";
 
 // Assets in /public
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 const HERO_BG_DESKTOP = "/mambo_hero.png";
 const HERO_BG_MOBILE = "/mambo_hero.png";
-=======
-const HERO_BG = "/mambo_hero.png";
->>>>>>> Stashed changes
-=======
-const HERO_BG = "/mambo_hero.png";
->>>>>>> Stashed changes
-=======
-const HERO_BG = "/mambo_hero.png";
->>>>>>> Stashed changes
 const MEMES_BG = "/memes_section.png";
 
 /**
