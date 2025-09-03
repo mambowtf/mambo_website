@@ -32,7 +32,8 @@ const SITE = {
 const FIXED_CHART_SYMBOL = "UNISWAP:MAMBOWETH_EEAD66.USD";
 
 // Assets in /public
-const HERO_BG = "/hero-section1.jpg";
+const HERO_BG_DESKTOP = "/telegram-cloud-document-4-5890980523332869722.jpg";
+const HERO_BG_MOBILE = "/telegram-cloud-document-4-5890980523332869722.jpg";
 const MEMES_BG = "/memes_section.png";
 
 /**
@@ -583,12 +584,22 @@ export default function Page() {
       <section
         className="relative overflow-hidden h-[95vh]"
         style={{
-          backgroundImage: `url(${HERO_BG})`,
+          backgroundImage: `url(${HERO_BG_MOBILE})`,
           backgroundSize: "cover",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
         }}
       >
+        {/* Desktop background overlay */}
+        <div 
+          className="hidden md:block absolute inset-0"
+          style={{
+            backgroundImage: `url(${HERO_BG_DESKTOP})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
         {/* Hero buttons - Desktop */}
         <div className="hidden md:block">
           {SIGN_LINKS.map(({ key, label, href }) => {
@@ -600,7 +611,7 @@ export default function Page() {
               top: r.top,
               width: r.width,
               height: r.height,
-              transform: `rotate(${r.rot || "0deg"})`,
+              transform: `rotate(${r.rot || "0deg"}) scale(0.8)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -616,7 +627,6 @@ export default function Page() {
               paddingInline: "1vw",
               minWidth: "120px",
               minHeight: "50px",
-              transform: `rotate(${r.rot || "0deg"}) scale(0.8)`,
             };
             return (
               <a
@@ -636,7 +646,7 @@ export default function Page() {
                     textShadow: "0 2px 0 rgba(0,0,0,.35)",
                     whiteSpace: "nowrap",
                     WebkitTextStroke: "1px #000000",
-                    textStroke: "1px #000000",
+
                     paintOrder: "stroke fill",
                   }}
                 >
@@ -703,7 +713,7 @@ export default function Page() {
                     fontSize: "clamp(10px, 2.5vw, 12px)",
                     fontWeight: "600",
                     WebkitTextStroke: "1px #000000",
-                    textStroke: "1px #000000",
+
                     paintOrder: "stroke fill",
                   }}
                 >
@@ -799,7 +809,7 @@ export default function Page() {
                     fontSize: "clamp(16px, 3.2vw, 28px)",
                     color: "#ffffff",
                     WebkitTextStroke: "2px #000000",
-                    textStroke: "2px #000000",
+
                     paintOrder: "stroke fill",
                     textShadow: "2px 2px 0 #000",
                     whiteSpace: "nowrap"
@@ -838,7 +848,7 @@ export default function Page() {
               style={{ 
                 fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
                 WebkitTextStroke: "2px #000000",
-                textStroke: "2px #000000",
+
                 paintOrder: "stroke fill"
               }}
             >
@@ -887,7 +897,7 @@ export default function Page() {
             style={{ 
               fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
               WebkitTextStroke: "2px #000000",
-              textStroke: "2px #000000",
+
               paintOrder: "stroke fill"
             }}
             data-scroll-id="community-title"
@@ -909,7 +919,7 @@ export default function Page() {
             style={{ 
               fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
               WebkitTextStroke: "2px #000000",
-              textStroke: "2px #000000",
+
               paintOrder: "stroke fill"
             }}
             data-scroll-id="whitepaper-title"
@@ -930,7 +940,7 @@ export default function Page() {
                   style={{ 
                     fontSize: "clamp(28px, 2.6vw + 12px, 44px)",
                     WebkitTextStroke: "2px #000000",
-                    textStroke: "2px #000000",
+
                     paintOrder: "stroke fill"
                   }}
                 >
@@ -957,7 +967,7 @@ export default function Page() {
             style={{ 
               fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
               WebkitTextStroke: "2px #000000",
-              textStroke: "2px #000000",
+
               paintOrder: "stroke fill"
             }}
             data-scroll-id="lore-title"
@@ -1023,7 +1033,7 @@ export default function Page() {
             style={{ 
               fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
               WebkitTextStroke: "2px #000000",
-              textStroke: "2px #000000",
+
               paintOrder: "stroke fill"
             }}
             data-scroll-id="chart-title"
@@ -1044,7 +1054,7 @@ export default function Page() {
             style={{ 
               fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
               WebkitTextStroke: "2px #000000",
-              textStroke: "2px #000000",
+
               paintOrder: "stroke fill"
             }}
             data-scroll-id="howbuy-title"
@@ -1090,7 +1100,7 @@ export default function Page() {
               </div>
               <button
                 onClick={(event) => {
-                  const button = event.target;
+                  const button = event.target as HTMLButtonElement;
                   const gameContainer = document.getElementById('game');
                   
                   // Add CHAOS to the button itself!
@@ -1223,7 +1233,7 @@ export default function Page() {
                     
                     // Create MASSIVE chaotic banana explosion from button
                     const bananaCount = 16;
-                    const bananas = [];
+                    const bananas: HTMLElement[] = [];
                     const buttonRect = event.target.getBoundingClientRect();
                     const centerX = buttonRect.left + buttonRect.width / 2;
                     const centerY = buttonRect.top + buttonRect.height / 2;
@@ -1318,7 +1328,7 @@ export default function Page() {
             style={{ 
               fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
               WebkitTextStroke: "2px #000000",
-              textStroke: "2px #000000",
+
               paintOrder: "stroke fill"
             }}
             data-scroll-id="partners-title"
