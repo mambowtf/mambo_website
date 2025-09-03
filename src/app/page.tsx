@@ -66,10 +66,10 @@ const HERO_HITBOXES: Record<string, Rect> = {
   tt:  { left: "6.2%", top: "57.8%", width: "12.2%", height: "7.0%", rot: "3deg" },
 };
 const SIGN_LINKS = [
-  { key: "buy", label: "Buy $MAMBO", href: SITE.TOKEN.buyUrl },
-  { key: "x",   label: "Follow X",   href: SITE.TOKEN.xUrl },
-  { key: "tg",  label: "Join TG",    href: SITE.TOKEN.tgUrl },
-  { key: "tt",  label: "Shop",       href: SITE.TOKEN.tiktokUrl },
+  { key: "buy", label: "Buy $MAMBO", href: SITE.TOKEN.buyUrl, logo: "/uniswap.jpg" },
+  { key: "x",   label: "Follow X",   href: SITE.TOKEN.xUrl, logo: "/xlogo.jpg" },
+  { key: "tg",  label: "Join TG",    href: SITE.TOKEN.tgUrl, logo: "/tglogo.jpg" },
+  { key: "tt",  label: "Shop",       href: SITE.TOKEN.tiktokUrl, logo: "/shopicon.jpg" },
 ] as const;
 const BOARD_STYLE: Record<string, { bg: string; color: string }> = {
   buy: { bg: "#f4d21a", color: "#0f0f0f" },
@@ -286,7 +286,7 @@ function TweetWall({ ids }: { ids: string[] }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  const STEP = isMobile ? 1 : 2;
+  const STEP = isMobile ? 2 : 2;
   const pages = Math.max(1, Math.ceil(ids.length / STEP));
   const [page, setPage] = useState(0);
   const next = useCallback(() => setPage((p) => (p + 1) % pages), [pages]);
@@ -308,7 +308,7 @@ function TweetWall({ ids }: { ids: string[] }) {
             const slice = ids.slice(pi * STEP, pi * STEP + STEP);
             return (
               <div key={pi} className="w-full shrink-0 px-0">
-                <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                <div className={`grid gap-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-2'}`}>
                   {slice.map((id) => (
                     <div
                       key={id}
@@ -602,7 +602,7 @@ export default function Page() {
         />
         {/* Hero buttons - Desktop */}
         <div className="hidden md:block">
-          {SIGN_LINKS.map(({ key, label, href }) => {
+          {SIGN_LINKS.map(({ key, label, href, logo }) => {
             const r = HERO_HITBOXES[key];
             const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
             const style: CSSProperties = {
@@ -638,27 +638,29 @@ export default function Page() {
                 style={style}
                 className="select-none hover-jiggle"
               >
-                <span
-                  className={`${luckiest.className} font-black leading-none`}
-                  style={{
-                    fontSize: "clamp(10px, 0.9vw + 7px, 16px)",
-                    letterSpacing: 0.5,
-                    textShadow: "0 2px 0 rgba(0,0,0,.35)",
-                    whiteSpace: "nowrap",
-                    WebkitTextStroke: "1px #000000",
-
-                    paintOrder: "stroke fill",
-                  }}
-                >
-                  {label}
-                </span>
+                <div className="flex flex-col items-center gap-1">
+                  <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                  <span
+                    className={`${luckiest.className} font-black leading-none`}
+                    style={{
+                      fontSize: "clamp(8px, 0.7vw + 5px, 12px)",
+                      letterSpacing: 0.5,
+                      textShadow: "0 2px 0 rgba(0,0,0,.35)",
+                      whiteSpace: "nowrap",
+                      WebkitTextStroke: "1px #000000",
+                      paintOrder: "stroke fill",
+                    }}
+                  >
+                    {label}
+                  </span>
+                </div>
               </a>
             );
           })}
         </div>
 
         {/* MAMBO Logo Overlay - Mobile (where buttons were) */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[8%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[1%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
           <img
             src="/herotext.jpg"
             alt="$MAMBO THE GORILLA"
@@ -690,7 +692,7 @@ export default function Page() {
         {/* Hero buttons - Mobile (4x1 horizontal at top left) */}
         <div className="absolute left-[5%] top-[5%] text-center md:hidden">
           <div className="grid grid-cols-4 gap-1">
-            {SIGN_LINKS.map(({ key, label, href }) => {
+            {SIGN_LINKS.map(({ key, label, href, logo }) => {
               const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
               return (
                 <a
@@ -717,7 +719,10 @@ export default function Page() {
                     paintOrder: "stroke fill",
                   }}
                 >
-                  {label}
+                  <div className="flex flex-col items-center gap-0.5">
+                    <img src={logo} alt="" className="w-3 h-3 object-contain" />
+                    <span className="text-xs leading-none">{label}</span>
+                  </div>
                 </a>
               );
             })}
@@ -927,7 +932,7 @@ export default function Page() {
             Whitepaper
           </h2>
 
-          <div className="rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,.65)] p-6 md:p-10">
+          <div className={`rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,.65)] p-6 md:p-10 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-flip-down' : ''}`}>
             <div className="grid grid-cols-1 md:grid-cols-[360px_1fr] items-center gap-8">
               <div className="relative">
                 <img
@@ -937,7 +942,7 @@ export default function Page() {
                 />
                 {/* Speech bubble that appears naturally after gorilla */}
                 <div 
-                  className={`absolute -top-8 -right-4 bg-white rounded-2xl px-4 py-2 shadow-lg border-2 border-black ${visibleElements.has('whitepaper-title') ? 'animate-speech-bubble' : 'opacity-0'}`}
+                  className={`absolute -top-8 -right-4 bg-white rounded-2xl px-4 py-2 shadow-lg border-2 border-black hidden md:block ${visibleElements.has('whitepaper-title') ? 'animate-speech-bubble' : 'opacity-0'}`}
                   style={{
                     animationDelay: '0.8s'
                   }}
@@ -992,7 +997,7 @@ export default function Page() {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6 mt-7">
-            <div className="rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden">
+            <div className={`rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden scroll-animate ${visibleElements.has('lore-title') ? 'animate-flip-down' : ''}`}>
               <img
                 src="/cards/mambo_waveV2.png"
                 alt="Stats art"
@@ -1008,7 +1013,7 @@ export default function Page() {
                 <div className="font-extrabold text-[18px]">1 Common Goal</div>
               </div>
             </div>
-            <div className="rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden">
+            <div className={`rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden scroll-animate ${visibleElements.has('lore-title') ? 'animate-flip-down' : ''}`}>
               <img
                 src="/cards/japan.jpg"
                 alt="Utilities art"
@@ -1026,7 +1031,7 @@ export default function Page() {
                 </div>
               </div>
             </div>
-            <div className="rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden">
+            <div className={`rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden scroll-animate ${visibleElements.has('lore-title') ? 'animate-flip-down' : ''}`}>
               <img
                 src="/cards/mambo_basketball.png"
                 alt="No selling art"
@@ -1078,20 +1083,22 @@ export default function Page() {
             How to Buy
           </h2>
 
-          <div className={`rounded-2xl border-4 border-white bg-[#0A84FF] px-4 py-4 shadow-[0_18px_40px_rgba(0,0,0,.35)] scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-flip-down' : ''}`}>
-            <div className="grid grid-cols-2 md:grid-cols-4 text-center font-extrabold divide-y divide-x-2 md:divide-y-0 divide-white/70">
-              {[
-                ["Step 1", "Download Metamask Wallet"],
-                ["Step 2", "Load up ETH from an Exchange"],
-                ["Step 3", "Copy the CA"],
-                ["Step 4", "Head over to Uniswap and buy $MAMBO"],
-              ].map(([s, t]) => (
-                <div key={s} className="py-2 px-3">
-                  <div className="text-white text-xl">{s}</div>
-                  <div className="text-[13px] leading-tight opacity-90">{t}</div>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-7">
+            {[
+              ["Step 1", "Download Metamask Wallet"],
+              ["Step 2", "Load up ETH from an Exchange"],
+              ["Step 3", "Copy the CA"],
+              ["Step 4", "Head over to Uniswap and buy $MAMBO"],
+            ].map(([s, t], index) => (
+              <div 
+                key={s} 
+                className={`rounded-xl border-4 border-white bg-[#0A84FF] p-4 shadow-[0_18px_40px_rgba(0,0,0,.35)] text-center font-extrabold scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-flip-down' : ''}`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="text-white text-xl mb-2">{s}</div>
+                <div className="text-[13px] leading-tight opacity-90">{t}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -1116,6 +1123,11 @@ export default function Page() {
               </div>
               <button
                 onClick={(event) => {
+                  // Play gorilla sound
+                  const audio = new Audio("/A sound where a person imitates a gorilla with his voice.mp3");
+                  audio.volume = 0.7;
+                  audio.play().catch(console.error);
+                  
                   // Create MASSIVE chaotic banana explosion from button
                   const bananaCount = 16;
                   const bananas: HTMLElement[] = [];
@@ -1278,11 +1290,16 @@ export default function Page() {
       <section className="bg-black text-white py-16">
         <div className="mx-auto max-w-[1340px] w-[92vw] text-center">
           <div className="mb-8">
-            <img 
+            <video 
               src="/mambo_running.gif.mp4" 
-              alt="Mambo running" 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
               className="mx-auto max-w-[300px] w-full h-auto rounded-lg shadow-2xl"
-            />
+            >
+              Your browser does not support the video tag.
+            </video>
           </div>
           <blockquote className="text-2xl md:text-4xl font-bold italic text-white max-w-4xl mx-auto">
             <p className="mb-4">
