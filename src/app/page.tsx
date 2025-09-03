@@ -32,8 +32,8 @@ const SITE = {
 const FIXED_CHART_SYMBOL = "UNISWAP:MAMBOWETH_EEAD66.USD";
 
 // Assets in /public
-const HERO_BG_DESKTOP = "/telegram-cloud-document-4-5890980523332869722.jpg";
-const HERO_BG_MOBILE = "/telegram-cloud-document-4-5890980523332869722.jpg";
+const HERO_BG_DESKTOP = "/mambo-hero.jpg";
+const HERO_BG_MOBILE = "/mambo-hero.jpg";
 const MEMES_BG = "/memes_section.png";
 
 /**
@@ -1234,7 +1234,7 @@ export default function Page() {
                     // Create MASSIVE chaotic banana explosion from button
                     const bananaCount = 16;
                     const bananas: HTMLElement[] = [];
-                    const buttonRect = event.target.getBoundingClientRect();
+                    const buttonRect = (event.target as HTMLButtonElement).getBoundingClientRect();
                     const centerX = buttonRect.left + buttonRect.width / 2;
                     const centerY = buttonRect.top + buttonRect.height / 2;
                     
