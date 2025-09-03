@@ -286,7 +286,7 @@ function TweetWall({ ids }: { ids: string[] }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  const STEP = isMobile ? 2 : 2;
+  const STEP = isMobile ? 1 : 1;
   const pages = Math.max(1, Math.ceil(ids.length / STEP));
   const [page, setPage] = useState(0);
   const next = useCallback(() => setPage((p) => (p + 1) % pages), [pages]);
@@ -308,7 +308,7 @@ function TweetWall({ ids }: { ids: string[] }) {
             const slice = ids.slice(pi * STEP, pi * STEP + STEP);
             return (
               <div key={pi} className="w-full shrink-0 px-0">
-                <div className={`grid gap-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-2'}`}>
+                <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1'}`}>
                   {slice.map((id) => (
                     <div
                       key={id}
@@ -550,8 +550,8 @@ export default function Page() {
     console.assert(ok, "Sanity checks failed.");
   }, []);
 
-  // ===== Meme rotation logic (4 unique at a time, auto every 30s) =====
-  const PER = 4;
+  // ===== Meme rotation logic (3 unique at a time, auto every 30s) =====
+  const PER = 3;
   const pages = Math.max(1, Math.ceil(MEME_POOL.length / PER));
   const [page, setPage] = useState(0);
 
@@ -638,29 +638,26 @@ export default function Page() {
                 style={style}
                 className="select-none hover-jiggle"
               >
-                <div className="flex flex-col items-center gap-1">
-                  <img src={logo} alt="" className="w-4 h-4 object-contain" />
-                  <span
-                    className={`${luckiest.className} font-black leading-none`}
-                    style={{
-                      fontSize: "clamp(8px, 0.7vw + 5px, 12px)",
-                      letterSpacing: 0.5,
-                      textShadow: "0 2px 0 rgba(0,0,0,.35)",
-                      whiteSpace: "nowrap",
-                      WebkitTextStroke: "1px #000000",
-                      paintOrder: "stroke fill",
-                    }}
-                  >
-                    {label}
-                  </span>
-                </div>
+                <span
+                  className={`${luckiest.className} font-black leading-none`}
+                  style={{
+                    fontSize: "clamp(10px, 0.9vw + 7px, 16px)",
+                    letterSpacing: 0.5,
+                    textShadow: "0 2px 0 rgba(0,0,0,.35)",
+                    whiteSpace: "nowrap",
+                    WebkitTextStroke: "1px #000000",
+                    paintOrder: "stroke fill",
+                  }}
+                >
+                  {label}
+                </span>
               </a>
             );
           })}
         </div>
 
         {/* MAMBO Logo Overlay - Mobile (where buttons were) */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[1%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[0%] text-center md:hidden" style={{ width: "100vw", height: "700px" }}>
           <img
             src="/herotext.jpg"
             alt="$MAMBO THE GORILLA"
@@ -719,10 +716,14 @@ export default function Page() {
                     paintOrder: "stroke fill",
                   }}
                 >
-                  <div className="flex flex-col items-center gap-0.5">
-                    <img src={logo} alt="" className="w-3 h-3 object-contain" />
-                    <span className="text-xs leading-none">{label}</span>
-                  </div>
+                  <img 
+                    src={logo} 
+                    alt={label} 
+                    className="w-6 h-6 object-contain mx-auto" 
+                    style={{
+                      filter: key === 'tt' ? 'none' : 'none'
+                    }}
+                  />
                 </a>
               );
             })}
@@ -842,20 +843,20 @@ export default function Page() {
       >
         <div className="mx-auto w-[92vw] max-w-[1340px] h-full flex flex-col">
           <div
-            className="rounded-[28px] border-[6px] border-white shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-[#0A84FF] px-5 md:px-8 lg:px-10 py-5 md:py-7 lg:py-8 mt-5 overflow-hidden"
+            className={`rounded-[28px] border-[6px] border-white shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-[#0A84FF] px-5 md:px-8 lg:px-10 py-5 md:py-7 lg:py-8 mt-5 overflow-hidden scroll-animate ${visibleElements.has('memes-title') ? 'animate-flip-down' : ''}`}
             style={{
               boxShadow:
                 "0 18px 40px rgba(0,0,0,.35), inset 0 6px 0 rgba(255,255,255,.2), inset 0 -7px 0 rgba(0,0,0,.22)",
             }}
           >
             <h2
-              className={`${luckiest.className} text-white leading-none mb-4`}
+              className={`${luckiest.className} text-white leading-none mb-4 scroll-animate ${visibleElements.has('memes-title') ? 'animate-slide-in-up' : ''}`}
               style={{ 
                 fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
                 WebkitTextStroke: "2px #000000",
-
                 paintOrder: "stroke fill"
               }}
+              data-scroll-id="memes-title"
             >
               Memes
             </h2>
@@ -868,7 +869,7 @@ export default function Page() {
                   <button
                     key={`${poolIdx}-${page}`} // forces refresh when page changes
                     onClick={() => lb.openAt(poolIdx)}
-                    className="rounded-[16px] overflow-hidden border-4 border-neutral-900 shadow-[0_12px_26px_rgba(0,0,0,.28)] focus:outline-none focus:ring-2 focus:ring-black/40 hover-jiggle"
+                    className="rounded-[16px] overflow-hidden border-4 border-neutral-900 shadow-[0_12px_26px_rgba(0,0,0,.28)] focus:outline-none focus:ring-2 focus:ring-black/40"
                   >
                     <img
                       src={img.src}
@@ -919,20 +920,18 @@ export default function Page() {
       {/* ================= WHITEPAPER (between lore and chart) ================= */}
       <section id="whitepaper" className="bg-black text-white py-8">
         <div className="mx-auto w-[92vw] max-w-[1340px]">
-          <h2
-            className={`${luckiest.className} text-white leading-none mb-6 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
-            style={{ 
-              fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
-              WebkitTextStroke: "2px #000000",
-
-              paintOrder: "stroke fill"
-            }}
-            data-scroll-id="whitepaper-title"
-          >
-            Whitepaper
-          </h2>
-
           <div className={`rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,.65)] p-6 md:p-10 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-flip-down' : ''}`}>
+            <h2
+              className={`${luckiest.className} text-white leading-none mb-6 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
+              style={{ 
+                fontSize: "clamp(44px, 3.6vw + 16px, 72px)",
+                WebkitTextStroke: "2px #000000",
+                paintOrder: "stroke fill"
+              }}
+              data-scroll-id="whitepaper-title"
+            >
+              Whitepaper
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-[360px_1fr] items-center gap-8">
               <div className="relative">
                 <img
@@ -1202,7 +1201,7 @@ export default function Page() {
       </section>
 
       {/* ================= PARTNERS ================= */}
-      <section id="partners" className="py-18 bg-black">
+      <section id="partners" className="pt-18 bg-black">
         <div className="mx-auto w-[92vw] max-w-[1340px]">
           <div className="flex flex-col gap-10">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
@@ -1287,9 +1286,9 @@ export default function Page() {
       </section>
 
       {/* ================= BOTTOM GIF & QUOTE ================= */}
-      <section className="bg-black text-white py-16">
+      <section className="bg-black text-white py-8">
         <div className="mx-auto max-w-[1340px] w-[92vw] text-center">
-          <div className="mb-8">
+          <div className="mb-4">
             <video 
               src="/mambo_running.gif.mp4" 
               autoPlay 
@@ -1303,7 +1302,7 @@ export default function Page() {
           </div>
           <blockquote className="text-2xl md:text-4xl font-bold italic text-white max-w-4xl mx-auto">
             <p className="mb-4">
-              "Keep on running no matter the market."
+              {"POWER > PRICE"}
             </p>
             <footer className="text-lg md:text-xl text-white/80">
               — $MAMBO THE GORILLA
