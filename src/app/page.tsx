@@ -154,7 +154,6 @@ function Lightbox({
 
 const TWEET_IDS = [
   "1958553962413740409",
-  "1958521717371842996",
   "1955735779730432469",
   "1955456198192636105", // <-- make sure these are valid Tweet IDs
 ];
@@ -189,164 +188,6 @@ function ensureTwitterWidgets(): Promise<any> {
   });
 }
 
-/** Visible carousel that creates tweets directly inside holders (no offscreen preload). */
-function TweetWall({ ids }: { ids: string[] }) {
-  const holdersRef = useRef<Record<string, HTMLElement | null>>({});
-  const createdRef = useRef<Set<string>>(new Set());
-  const [failedTweets, setFailedTweets] = useState<Set<string>>(new Set());
-
-  const attachHolder = useCallback(
-    (id: string) => (el: HTMLElement | null) => {
-      holdersRef.current[id] = el;
-    },
-    []
-  );
-
-  // Create tweets once per id, right inside their holders
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const tw = await ensureTwitterWidgets();
-      if (!tw || cancelled) return;
-
-      const createAll = () => {
-        ids.forEach(async (id) => {
-          if (createdRef.current.has(id) || failedTweets.has(id)) return;
-          const el = holdersRef.current[id];
-          if (!el) return;
-          try {
-            el.innerHTML = "";
-            await tw.widgets.createTweet(id, el, {
-              theme: "dark",
-              align: "center",
-              dnt: true,
-              width: Math.min(350, el.offsetWidth - 16),
-              chrome: "noheader nofooter noborders",
-            });
-            createdRef.current.add(id);
-          } catch (error) {
-            console.warn(`Failed to load tweet ${id}:`, error);
-            // Retry once after a delay
-            setTimeout(async () => {
-              try {
-                if (holdersRef.current[id] && !createdRef.current.has(id)) {
-                  await tw.widgets.createTweet(id, holdersRef.current[id], {
-                    theme: "dark",
-                    align: "center",
-                    dnt: true,
-                    width: Math.min(350, holdersRef.current[id]!.offsetWidth - 16),
-                    chrome: "noheader nofooter noborders",
-                  });
-                  createdRef.current.add(id);
-                }
-              } catch (retryError) {
-                console.warn(`Retry failed for tweet ${id}:`, retryError);
-                setFailedTweets(prev => new Set([...prev, id]));
-                // Add fallback content
-                if (holdersRef.current[id]) {
-                  holdersRef.current[id].innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-family: system-ui; background: #1a1a1a; border-radius: 8px;">
-                      <div style="text-align: center;">
-                        <div style="font-size: 18px; margin-bottom: 8px;">🐦</div>
-                        <div style="font-size: 14px;">Tweet unavailable</div>
-                      </div>
-                    </div>
-                  `;
-                }
-              }
-            }, 2000);
-          }
-        });
-      };
-
-      createAll();
-
-      // Retry a few times in case some holders weren't mounted yet
-      let tries = 0;
-      const tick = setInterval(() => {
-        if (cancelled || createdRef.current.size >= ids.length || tries++ > 8) {
-          clearInterval(tick);
-        } else {
-          createAll();
-        }
-      }, 1000);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [ids, failedTweets]);
-
-  // Carousel logic (responsive: 1 tweet on mobile, 2 on desktop)
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  const STEP = isMobile ? 1 : 2;
-  const pages = Math.max(1, Math.ceil(ids.length / STEP));
-  const [page, setPage] = useState(0);
-  const next = useCallback(() => setPage((p) => (p + 1) % pages), [pages]);
-  const prev = useCallback(() => setPage((p) => (p - 1 + pages) % pages), [pages]);
-
-  useEffect(() => {
-    const t = setInterval(next, 30000);
-    return () => clearInterval(t);
-  }, [next]);
-
-  return (
-    <div className="relative mt-6">
-      <div className="overflow-hidden">
-        <div
-          className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${page * 100}%)` }}
-        >
-          {Array.from({ length: pages }).map((_, pi) => {
-            const slice = ids.slice(pi * STEP, pi * STEP + STEP);
-            return (
-              <div key={pi} className="w-full shrink-0 px-0">
-                <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} justify-items-center`}>
-                  {slice.map((id) => (
-                    <div
-                      key={id}
-                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-[#0A84FF] text-black p-2 shadow-[0_14px_30px_rgba(0,0,0,.25)] min-h-[400px] md:min-h-[500px] flex flex-col w-fit mx-auto"
-                    >
-                      <div
-                        ref={attachHolder(id)}
-                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:max-w-full [&_.twitter-tweet]:bg-transparent flex-1 flex items-center justify-center overflow-hidden"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Arrows */}
-      <button
-        type="button"
-        aria-label="Previous tweets"
-        onClick={prev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 md:w-12 md:h-12 rounded-full bg-white text-black border-4 border-black grid place-items-center shadow-lg"
-      >
-        ‹
-      </button>
-      <button
-        type="button"
-        aria-label="Next tweets"
-        onClick={next}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-11 h-11 md:w-12 md:h-12 rounded-full bg-white text-black border-4 border-black grid place-items-center shadow-lg"
-      >
-        ›
-      </button>
-    </div>
-  );
-}
 
 /* ============================== TRADINGVIEW (fixed symbol) ============================== */
 
@@ -513,6 +354,42 @@ export default function Page() {
   const visibleElements = useScrollAnimation();
   
   // Removed scroll-triggered bananas - only button explosion remains
+
+  // ===== Load tweets =====
+  useEffect(() => {
+    const loadTweets = async () => {
+      const tw = await ensureTwitterWidgets();
+      if (tw) {
+        // Clear and load first tweet
+        const tweet1 = document.getElementById('tweet1');
+        if (tweet1) {
+          tweet1.innerHTML = '';
+          tw.widgets.createTweet("1955456198192636105", tweet1, {
+            theme: "dark",
+            align: "center",
+            dnt: true,
+            width: 400,
+            chrome: "noheader nofooter noborders",
+          });
+        }
+        
+        // Clear and load second tweet
+        const tweet2 = document.getElementById('tweet2');
+        if (tweet2) {
+          tweet2.innerHTML = '';
+          tw.widgets.createTweet("1958521717371842996", tweet2, {
+            theme: "dark",
+            align: "center",
+            dnt: true,
+            width: 400,
+            chrome: "noheader nofooter noborders",
+          });
+        }
+      }
+    };
+    
+    loadTweets();
+  }, []);
 
   // ===== Copy CA button =====
   const [copied, setCopied] = useState(false);
@@ -845,9 +722,9 @@ export default function Page() {
       {/* ================= MEMES (2×2 grid, auto-rotating, NO CTA) ================= */}
       <section
         id="memes"
-        className="relative pt-16"
+        className="relative pt-16 pb-16"
         style={{
-          height: "100vh",
+          minHeight: "100vh",
           backgroundImage: `url(${MEMES_BG})`,
           backgroundPosition: "center bottom",
           backgroundRepeat: "no-repeat",
@@ -855,8 +732,8 @@ export default function Page() {
         } as CSSProperties}
       >
         <div className="mx-auto w-[92vw] max-w-[1340px] h-full flex flex-col">
-          <div
-            className={`rounded-[28px] border-[6px] border-white shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-[#0A84FF] px-5 md:px-8 lg:px-10 py-5 md:py-7 lg:py-8 mt-5 overflow-hidden scroll-animate ${visibleElements.has('memes-title') ? 'animate-flip-down' : ''}`}
+                      <div
+              className={`rounded-[28px] border-[6px] border-white shadow-[0_18px_40px_rgba(0,0,0,.35)] bg-[#0A84FF] px-5 md:px-8 lg:px-10 py-5 md:py-7 lg:py-8 mt-5 overflow-hidden scroll-animate ${visibleElements.has('memes-title') ? 'animate-flip-down' : ''}`}
             style={{
               boxShadow:
                 "0 18px 40px rgba(0,0,0,.35), inset 0 6px 0 rgba(255,255,255,.2), inset 0 -7px 0 rgba(0,0,0,.22)",
@@ -924,8 +801,17 @@ export default function Page() {
             Our Community is Always Active
           </h2>
 
-          {/* 2-card carousel (tweets created in-place) */}
-          <TweetWall ids={TWEET_IDS} />
+          {/* Two tweets side by side */}
+          <div className="flex justify-center gap-6 mt-32 mb-32">
+            <div 
+              id="tweet1" 
+              className="w-[400px] h-[500px] flex items-center justify-center"
+            />
+            <div 
+              id="tweet2" 
+              className="w-[400px] h-[500px] flex items-center justify-center hidden md:flex"
+            />
+          </div>
 
         </div>
       </section>
@@ -952,20 +838,6 @@ export default function Page() {
                   alt="Gorilla illustration"
                   className={`w-full md:w-[340px] mx-auto scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-slide-in-up' : ''}`}
                 />
-                {/* Speech bubble that appears naturally after gorilla */}
-                <div 
-                  className={`absolute -top-8 -right-4 bg-white rounded-2xl px-4 py-2 shadow-lg border-2 border-black hidden md:block ${visibleElements.has('whitepaper-title') ? 'animate-speech-bubble' : 'opacity-0'}`}
-                  style={{
-                    animationDelay: '0.8s'
-                  }}
-                >
-                  <div className="text-black font-bold text-sm whitespace-nowrap">
-                    Read Whitepaper
-                  </div>
-                  {/* Speech bubble tail */}
-                  <div className="absolute bottom-[-8px] left-4 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-white"></div>
-                  <div className="absolute bottom-[-10px] left-[15px] w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-black"></div>
-                </div>
               </div>
               <div className="text-white">
                 <p
@@ -1048,7 +920,7 @@ export default function Page() {
               />
               <div className="text-white p-4 text-sm leading-tight">
                 <div className="font-extrabold text-[25px]">CHADS ONLY</div>
-                <div className="font-extrabold text-[25px]">NO SELLING</div>
+                <div className="font-extrabold text-[25px]"><span className="text-red-500">NO</span> SELLING</div>
               </div>
             </div>
           </div>
@@ -1115,7 +987,7 @@ export default function Page() {
       {/* ================= GAME PLACEHOLDER ================= */}
       <section id="game" className="text-white py-18" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
-          <div className="rounded-2xl border-4 border-white bg-[#555] grid place-items-center h-[340px] md:h-[420px] overflow-hidden">
+          <div className="rounded-2xl border-4 border-white grid place-items-center h-[340px] md:h-[420px] overflow-hidden" style={{ backgroundColor: "#1a1a1a" }}>
             <div className="text-center">
               <h2
                 className={`${luckiest.className} text-white leading-none`}
@@ -1301,57 +1173,37 @@ export default function Page() {
           <div className="mb-4">
             {/* Mobile: Single GIF */}
             <div className="md:hidden">
-              <video 
-                src="/mambo_running.gif.mp4" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="mx-auto max-w-[300px] w-full h-auto rounded-lg shadow-2xl"
-              >
-                Your browser does not support the video tag.
-              </video>
+              <img 
+                src="/mambo_running.gif" 
+                alt="Mambo running"
+                className="mx-auto max-w-[300px] w-full h-auto rounded-lg"
+              />
             </div>
             {/* Desktop: 3 GIFs side by side */}
             <div className="hidden md:flex justify-center items-center gap-4">
-              <video 
-                src="/mambo_running.gif.mp4" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="max-w-[250px] w-full h-auto rounded-lg shadow-2xl"
-              >
-                Your browser does not support the video tag.
-              </video>
-              <video 
-                src="/mambo_running.gif.mp4" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="max-w-[250px] w-full h-auto rounded-lg shadow-2xl"
-              >
-                Your browser does not support the video tag.
-              </video>
-              <video 
-                src="/mambo_running.gif.mp4" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="max-w-[250px] w-full h-auto rounded-lg shadow-2xl"
-              >
-                Your browser does not support the video tag.
-              </video>
+              <img 
+                src="/mambo_running.gif" 
+                alt="Mambo running"
+                className="max-w-[250px] w-full h-auto rounded-lg"
+              />
+              <img 
+                src="/mambo_running.gif" 
+                alt="Mambo running"
+                className="max-w-[250px] w-full h-auto rounded-lg"
+              />
+              <img 
+                src="/mambo_running.gif" 
+                alt="Mambo running"
+                className="max-w-[250px] w-full h-auto rounded-lg"
+              />
             </div>
           </div>
           <blockquote className="text-2xl md:text-4xl font-bold italic text-white max-w-4xl mx-auto">
             <p className="mb-4">
-              {"POWER > PRICE"}
+              {"\"Power > Price\""}
             </p>
             <footer className="text-lg md:text-xl text-white/80">
-              — $MAMBO THE GORILLA
+              — MAMBO
             </footer>
           </blockquote>
         </div>
