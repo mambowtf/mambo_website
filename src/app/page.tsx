@@ -312,11 +312,11 @@ function TweetWall({ ids }: { ids: string[] }) {
                   {slice.map((id) => (
                     <div
                       key={id}
-                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-transparent text-black p-2 shadow-[0_14px_30px_rgba(0,0,0,.25)] min-h-[400px] md:min-h-[500px] flex flex-col"
+                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-[#0A84FF] text-black p-2 shadow-[0_14px_30px_rgba(0,0,0,.25)] min-h-[400px] md:min-h-[500px] flex flex-col"
                     >
                       <div
                         ref={attachHolder(id)}
-                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:max-w-full flex-1 flex items-center justify-center overflow-hidden"
+                        className="[&_.twitter-tweet]:m-0 [&_.twitter-tweet]:mx-auto [&_.twitter-tweet]:max-w-full [&_.twitter-tweet]:bg-transparent flex-1 flex items-center justify-center overflow-hidden"
                       />
                     </div>
                   ))}
@@ -550,8 +550,8 @@ export default function Page() {
     console.assert(ok, "Sanity checks failed.");
   }, []);
 
-  // ===== Meme rotation logic (3 unique at a time, auto every 30s) =====
-  const PER = 3;
+  // ===== Meme rotation logic (4 unique at a time, auto every 30s) =====
+  const PER = 4;
   const pages = Math.max(1, Math.ceil(MEME_POOL.length / PER));
   const [page, setPage] = useState(0);
 
@@ -578,7 +578,7 @@ export default function Page() {
   );
 
   return (
-    <div className="min-h-screen text-slate-100">
+    <div className="min-h-screen text-slate-100" style={{ backgroundColor: "#2d2e2c" }}>
 
       {/* ================= HERO ================= */}
       <section
@@ -671,8 +671,23 @@ export default function Page() {
           />
         </div>
 
+        {/* MAMBO Logo Overlay - Tablet */}
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[20%] text-center hidden md:block lg:hidden" style={{ width: "100vw", height: "510px" }}>
+          <img
+            src="/herotext.jpg"
+            alt="$MAMBO THE GORILLA"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              transform: "scale(1.1)",
+              filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.5))",
+            }}
+          />
+        </div>
+
         {/* MAMBO Logo Overlay - Desktop */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[15%] text-center hidden md:block" style={{ width: "100vw", height: "510px" }}>
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[15%] text-center hidden lg:block" style={{ width: "100vw", height: "510px" }}>
           <img
             src="/herotext.jpg"
             alt="$MAMBO THE GORILLA"
@@ -731,7 +746,7 @@ export default function Page() {
         </div>
 
         {/* Contract banner with tiny copy button */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[5%] w-[min(960px,95vw)] px-2 md:px-4">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-[5%] w-[min(1200px,90vw)] px-2 md:px-4">
           <div
             className="relative rounded-[28px] flex items-center justify-between px-4 md:px-6 py-3 md:py-5"
             style={{
@@ -744,7 +759,7 @@ export default function Page() {
             <span
               className={`${luckiest.className} leading-none flex-1 text-center`}
               style={{
-                fontSize: "clamp(11px, 1.4vw + 5px, 39px)",
+                fontSize: "clamp(10px, 1.2vw + 4px, 32px)",
                 color: "#ffffff",
                 WebkitTextStroke: "2px #0f0f0f",
                 paintOrder: "stroke fill",
@@ -752,6 +767,8 @@ export default function Page() {
                 letterSpacing: "0.01em",
                 whiteSpace: "nowrap",
                 paddingRight: "12px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               CA: {SITE.TOKEN.contract}
@@ -862,7 +879,7 @@ export default function Page() {
             </h2>
 
             {/* 2×2 big image grid — auto updates every 30s */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {visibleIndices.map((poolIdx) => {
                 const img = MEME_POOL[poolIdx];
                 return (
@@ -896,7 +913,7 @@ export default function Page() {
       </section>
 
       {/* ================= COMMUNITY ================= */}
-      <section id="community" className="py-8" style={{ background: "black" }}>
+      <section id="community" className="py-8" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('community-title') ? 'animate-slide-in-up' : ''}`}
@@ -918,7 +935,7 @@ export default function Page() {
       </section>
 
       {/* ================= WHITEPAPER (between lore and chart) ================= */}
-      <section id="whitepaper" className="bg-black text-white py-8">
+      <section id="whitepaper" className="text-white py-8" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto w-[92vw] max-w-[1340px]">
           <div className={`rounded-xl border-4 border-white bg-[#0A84FF] overflow-hidden shadow-[0_18px_40px_rgba(0,0,0,.65)] p-6 md:p-10 scroll-animate ${visibleElements.has('whitepaper-title') ? 'animate-flip-down' : ''}`}>
             <h2
@@ -980,7 +997,7 @@ export default function Page() {
       </section>
 
       {/* ================= 3 CARDS ================= */}
-      <section id="extra-howbuy" className="bg-black text-white py-8">
+      <section id="extra-howbuy" className="text-white py-8" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('lore-title') ? 'animate-slide-in-up' : ''}`}
@@ -1046,7 +1063,7 @@ export default function Page() {
       </section>
 
       {/* ================= PRICE ACTION (no search; fixed symbol) ================= */}
-      <section id="live-chart" className="bg-black text-white py-8">
+      <section id="live-chart" className="text-white py-8" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('chart-title') ? 'animate-slide-in-up' : ''}`}
@@ -1067,7 +1084,7 @@ export default function Page() {
       </section>
 
       {/* ================= HOW TO BUY ================= */}
-      <section id="extra-howbuy-2" className="bg-black text-white py-8">
+      <section id="extra-howbuy-2" className="text-white py-8" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <h2
             className={`${luckiest.className} text-white leading-none scroll-animate ${visibleElements.has('howbuy-title') ? 'animate-slide-in-up' : ''}`}
@@ -1103,7 +1120,7 @@ export default function Page() {
       </section>
 
       {/* ================= GAME PLACEHOLDER ================= */}
-      <section id="game" className="bg-black text-white py-18">
+      <section id="game" className="text-white py-18" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           <div className="rounded-2xl border-4 border-white bg-[#555] grid place-items-center h-[340px] md:h-[420px] overflow-hidden">
             <div className="text-center">
@@ -1201,7 +1218,7 @@ export default function Page() {
       </section>
 
       {/* ================= PARTNERS ================= */}
-      <section id="partners" className="pt-18 bg-black">
+      <section id="partners" className="pt-18" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto w-[92vw] max-w-[1340px]">
           <div className="flex flex-col gap-10">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
@@ -1286,19 +1303,55 @@ export default function Page() {
       </section>
 
       {/* ================= BOTTOM GIF & QUOTE ================= */}
-      <section className="bg-black text-white py-8">
+      <section className="text-white py-8" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw] text-center">
           <div className="mb-4">
-            <video 
-              src="/mambo_running.gif.mp4" 
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="mx-auto max-w-[300px] w-full h-auto rounded-lg shadow-2xl"
-            >
-              Your browser does not support the video tag.
-            </video>
+            {/* Mobile: Single GIF */}
+            <div className="md:hidden">
+              <video 
+                src="/mambo_running.gif.mp4" 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="mx-auto max-w-[300px] w-full h-auto rounded-lg shadow-2xl"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            {/* Desktop: 3 GIFs side by side */}
+            <div className="hidden md:flex justify-center items-center gap-4">
+              <video 
+                src="/mambo_running.gif.mp4" 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="max-w-[250px] w-full h-auto rounded-lg shadow-2xl"
+              >
+                Your browser does not support the video tag.
+              </video>
+              <video 
+                src="/mambo_running.gif.mp4" 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="max-w-[250px] w-full h-auto rounded-lg shadow-2xl"
+              >
+                Your browser does not support the video tag.
+              </video>
+              <video 
+                src="/mambo_running.gif.mp4" 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="max-w-[250px] w-full h-auto rounded-lg shadow-2xl"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
           <blockquote className="text-2xl md:text-4xl font-bold italic text-white max-w-4xl mx-auto">
             <p className="mb-4">
@@ -1312,7 +1365,7 @@ export default function Page() {
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="bg-black text-slate-400 border-t border-white/10 py-6">
+      <footer className="text-slate-400 border-t border-white/10 py-6" style={{ background: "#2d2e2c" }}>
         <div className="mx-auto max-w-[1340px] w-[92vw]">
           © {new Date().getFullYear()} MAMBO LLC · NFA · DYOR · WAGMI
         </div>
