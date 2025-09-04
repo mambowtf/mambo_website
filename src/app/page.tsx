@@ -220,7 +220,7 @@ function TweetWall({ ids }: { ids: string[] }) {
               theme: "dark",
               align: "center",
               dnt: true,
-              width: Math.min(500, el.offsetWidth - 16),
+              width: Math.min(400, el.offsetWidth - 16),
               chrome: "noheader nofooter noborders",
             });
             createdRef.current.add(id);
@@ -234,7 +234,7 @@ function TweetWall({ ids }: { ids: string[] }) {
                     theme: "dark",
                     align: "center",
                     dnt: true,
-                    width: Math.min(500, holdersRef.current[id]!.offsetWidth - 16),
+                    width: Math.min(400, holdersRef.current[id]!.offsetWidth - 16),
                     chrome: "noheader nofooter noborders",
                   });
                   createdRef.current.add(id);
@@ -308,11 +308,11 @@ function TweetWall({ ids }: { ids: string[] }) {
             const slice = ids.slice(pi * STEP, pi * STEP + STEP);
             return (
               <div key={pi} className="w-full shrink-0 px-0">
-                <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1'}`}>
+                <div className={`flex flex-col items-center gap-6 ${isMobile ? '' : ''}`}>
                   {slice.map((id) => (
                     <div
                       key={id}
-                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-[#0A84FF] text-black p-2 shadow-[0_14px_30px_rgba(0,0,0,.25)] min-h-[400px] md:min-h-[500px] flex flex-col"
+                      className="rounded-2xl border-[3px] md:border-4 border-[#0A84FF] bg-[#0A84FF] text-black p-2 shadow-[0_14px_30px_rgba(0,0,0,.25)] min-h-[400px] md:min-h-[500px] flex flex-col w-fit mx-auto"
                     >
                       <div
                         ref={attachHolder(id)}
