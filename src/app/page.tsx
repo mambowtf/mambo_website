@@ -18,10 +18,10 @@ const SITE = {
     symbol: "$MAMBO",
     tagline: "ETH",
     contract: "0x404d3295c8b1c61662068db584125a7Ebcc0d651",
-    buyUrl: "https://app.uniswap.org/explore/tokens/ethereum/0x404d3295c8b1c61662068db584125a7Ebcc0d651",
-    xUrl: "https://twitter.com/mamboETH",
+    buyUrl: "https://app.uniswap.org/swap?chain=mainnet&inputCurrency=NATIVE&outputCurrency=0x404d3295c8b1c61662068db584125a7ebcc0d651",
+    xUrl: "https://x.com/mamboeth",
     tgUrl: "https://t.me/mamboeth",
-    tiktokUrl: "https://mamboeth.shop",
+    tiktokUrl: "https://mamboeth.shop/",
   },
   galleryCtaUrl: "#",
   partnersCtaUrl: "#",
@@ -475,7 +475,7 @@ export default function Page() {
           }}
         />
         {/* Hero buttons - Desktop */}
-        <div className="hidden md:block">
+        <div className="hidden md:block z-20">
           {SIGN_LINKS.map(({ key, label, href, logo }) => {
             const r = HERO_HITBOXES[key];
             const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
@@ -501,6 +501,7 @@ export default function Page() {
               paddingInline: "1vw",
               minWidth: "120px",
               minHeight: "50px",
+              zIndex: 30,
             };
             return (
               <a
@@ -575,7 +576,7 @@ export default function Page() {
         </div>
 
         {/* Hero buttons - Mobile (4x1 horizontal at top left) */}
-        <div className="absolute left-[5%] top-[5%] text-center md:hidden">
+        <div className="absolute left-[5%] top-[5%] text-center md:hidden z-20">
           <div className="grid grid-cols-4 gap-1">
             {SIGN_LINKS.map(({ key, label, href, logo }) => {
               const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
@@ -600,8 +601,8 @@ export default function Page() {
                     fontSize: "clamp(10px, 2.5vw, 12px)",
                     fontWeight: "600",
                     WebkitTextStroke: "1px #000000",
-
                     paintOrder: "stroke fill",
+                    zIndex: 30,
                   }}
                 >
                   <img 
@@ -1209,12 +1210,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="text-slate-400 border-t border-white/10 py-6" style={{ background: "#2d2e2c" }}>
-        <div className="mx-auto max-w-[1340px] w-[92vw]">
-          © {new Date().getFullYear()} MAMBO LLC · NFA · DYOR · WAGMI
-        </div>
-      </footer>
 
       {/* Removed scroll-triggered falling bananas */}
     </div>
