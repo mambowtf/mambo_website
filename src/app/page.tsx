@@ -642,8 +642,7 @@ export default function Page() {
                     letterSpacing: 0.5,
                     textShadow: "0 2px 0 rgba(0,0,0,.35)",
                     whiteSpace: "nowrap",
-                    WebkitTextStroke: "1px #000000",
-                    paintOrder: "stroke fill",
+                    color: "#ffffff"
                   }}
                 >
                   {label}
@@ -961,7 +960,7 @@ export default function Page() {
                   }}
                 >
                   <div className="text-black font-bold text-sm whitespace-nowrap">
-                    Never Sell! 🦍
+                    Read Whitepaper
                   </div>
                   {/* Speech bubble tail */}
                   <div className="absolute bottom-[-8px] left-4 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-white"></div>
@@ -972,10 +971,7 @@ export default function Page() {
                 <p
                   className={`${luckiest.className} leading-tight`}
                   style={{ 
-                    fontSize: "clamp(28px, 2.6vw + 12px, 44px)",
-                    WebkitTextStroke: "2px #000000",
-
-                    paintOrder: "stroke fill"
+                    fontSize: "clamp(28px, 2.6vw + 12px, 44px)"
                   }}
                 >
                   Ready to learn more about $MAMBO?
