@@ -220,7 +220,7 @@ function TweetWall({ ids }: { ids: string[] }) {
               theme: "dark",
               align: "center",
               dnt: true,
-              width: Math.min(400, el.offsetWidth - 16),
+              width: Math.min(350, el.offsetWidth - 16),
               chrome: "noheader nofooter noborders",
             });
             createdRef.current.add(id);
@@ -234,7 +234,7 @@ function TweetWall({ ids }: { ids: string[] }) {
                     theme: "dark",
                     align: "center",
                     dnt: true,
-                    width: Math.min(400, holdersRef.current[id]!.offsetWidth - 16),
+                    width: Math.min(350, holdersRef.current[id]!.offsetWidth - 16),
                     chrome: "noheader nofooter noborders",
                   });
                   createdRef.current.add(id);
@@ -286,7 +286,7 @@ function TweetWall({ ids }: { ids: string[] }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  const STEP = isMobile ? 1 : 1;
+  const STEP = isMobile ? 1 : 2;
   const pages = Math.max(1, Math.ceil(ids.length / STEP));
   const [page, setPage] = useState(0);
   const next = useCallback(() => setPage((p) => (p + 1) % pages), [pages]);
@@ -308,7 +308,7 @@ function TweetWall({ ids }: { ids: string[] }) {
             const slice = ids.slice(pi * STEP, pi * STEP + STEP);
             return (
               <div key={pi} className="w-full shrink-0 px-0">
-                <div className={`flex flex-col items-center gap-6 ${isMobile ? '' : ''}`}>
+                <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} justify-items-center`}>
                   {slice.map((id) => (
                     <div
                       key={id}
@@ -320,9 +320,6 @@ function TweetWall({ ids }: { ids: string[] }) {
                       />
                     </div>
                   ))}
-                  {!isMobile && slice.length === 1 && (
-                    <div className="rounded-2xl border-[3px] md:border-4 border-transparent" />
-                  )}
                 </div>
               </div>
             );
