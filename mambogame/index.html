@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="high-score">High Score: 0</div>
+    <div id="combo" style="display: none;">COMBO x<span id="combo-count">1</span>!</div>
+    <div id="start-screen">
+      <h1>MAMBO JUMP</h1>
+      <h2>Press Space to Start</h2>
+      <p>Jump over obstacles and collect bananas!</p>
+      <p>Hold Space for higher jumps!</p>
+    </div>
+    <div id="game-over-screen" style="display: none;">
+      <h2>GAME OVER</h2>
+      <p>Final Score: <span id="final-score">0</span></p>
+      <p>High Score: <span id="final-high-score">0</span></p>
+      <p>Press Space to Restart</p>
+    </div>
+  </div>
+
+  <div style="display: none;">
+    <img id="monkey" src="assets/mambo_jump.png">
+    <img id="monkey_running" src="assets/mambo_running.gif">
+    <img id="banana" src="assets/banana.png">
+    <img id="obstacle" src="assets/obstacle.png">
+    <img id="background_layer_1" src="assets/background_layer_1.png">
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js"
+    }
+  }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>

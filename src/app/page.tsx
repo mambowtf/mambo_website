@@ -19,8 +19,8 @@ const SITE = {
     tagline: "ETH",
     contract: "0x404d3295c8b1c61662068db584125a7Ebcc0d651",
     buyUrl: "https://app.uniswap.org/swap?chain=mainnet&inputCurrency=NATIVE&outputCurrency=0x404d3295c8b1c61662068db584125a7ebcc0d651",
-    xUrl: "https://x.com/mamboeth",
-    tgUrl: "https://t.me/mamboeth",
+    xUrl: "https://x.com/Mambo_CTO",
+    tgUrl: "https://t.me/mambocommunity",
     tiktokUrl: "https://mamboeth.shop/",
   },
   galleryCtaUrl: "#",
@@ -63,19 +63,16 @@ const HERO_HITBOXES: Record<string, Rect> = {
   buy: { left: "6.2%", top: "30.2%", width: "12.5%", height: "7.2%", rot: "-4deg" },
   x:   { left: "6.1%", top: "39.6%", width: "12.2%", height: "7.0%", rot: "-2deg" },
   tg:  { left: "6.2%", top: "48.8%", width: "12.2%", height: "7.0%", rot: "1deg" },
-  tt:  { left: "6.2%", top: "57.8%", width: "12.2%", height: "7.0%", rot: "3deg" },
 };
 const SIGN_LINKS = [
   { key: "buy", label: "Buy $MAMBO", href: SITE.TOKEN.buyUrl, logo: "/uniswap.jpg" },
   { key: "x",   label: "Follow X",   href: SITE.TOKEN.xUrl, logo: "/xlogo.jpg" },
   { key: "tg",  label: "Join TG",    href: SITE.TOKEN.tgUrl, logo: "/tglogo.jpg" },
-  { key: "tt",  label: "Shop",       href: SITE.TOKEN.tiktokUrl, logo: "/shopicon.jpg" },
 ] as const;
 const BOARD_STYLE: Record<string, { bg: string; color: string }> = {
   buy: { bg: "#f4d21a", color: "#0f0f0f" },
   x:   { bg: "#0b0b0b", color: "#ffffff" },
   tg:  { bg: "#61c4ff", color: "#ffffff" },
-  tt:  { bg: "#ef4444", color: "#ffffff" },
 };
 
 /* ---------- UPDATED: each partner now includes a click URL ---------- */
@@ -414,7 +411,7 @@ export default function Page() {
 
   // Small sanity guard from earlier
   useEffect(() => {
-    const ok = (["buy", "x", "tg", "tt"] as const).every((k) => {
+    const ok = (["buy", "x", "tg"] as const).every((k) => {
       const r = HERO_HITBOXES[k];
       const n = (v: string) => +v.replace("%", "");
       return [r.left, r.top, r.width, r.height].every(
@@ -575,9 +572,9 @@ export default function Page() {
           />
         </div>
 
-        {/* Hero buttons - Mobile (4x1 horizontal at top left) */}
+        {/* Hero buttons - Mobile (3 in a row at top left) */}
         <div className="absolute left-[5%] top-[5%] text-center md:hidden z-20">
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-3 gap-1">
             {SIGN_LINKS.map(({ key, label, href, logo }) => {
               const palette = BOARD_STYLE[key] || { bg: "#fff", color: "#111" };
               return (
@@ -609,9 +606,7 @@ export default function Page() {
                     src={logo} 
                     alt={label} 
                     className="w-6 h-6 object-contain mx-auto" 
-                    style={{
-                      filter: key === 'tt' ? 'none' : 'none'
-                    }}
+                    style={{ filter: 'none' }}
                   />
                 </a>
               );
